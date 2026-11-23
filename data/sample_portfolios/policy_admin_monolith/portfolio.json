@@ -1,0 +1,24 @@
+{
+  "app_id": "INS-POL-ADMIN",
+  "app_name": "Insurance Policy Administration Monolith",
+  "business_domain": "Property & Casualty Insurance",
+  "source_platform": "IBM z/OS v2.4",
+  "target_platforms": ["Linux VM", "OpenShift"],
+  "nfr": {
+    "target_tps": 180.0,
+    "max_latency_p99_ms": 350.0,
+    "availability_sla": "99.9%",
+    "rto_minutes": 120,
+    "rpo_minutes": 15,
+    "regulatory_compliance": ["HIPAA", "State Insurance Board"],
+    "daily_batch_window_hours": 6.5
+  },
+  "racf_profiles": [
+    {
+      "profile_name": "INS.SURROGAT.*",
+      "resource_class": "SURROGAT",
+      "access_level": "UPDATE",
+      "authorized_groups": ["BATCHOPS"]
+    }
+  ]
+}

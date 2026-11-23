@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "skills": {
+    "frontend-design-deslop": {
+      "source": "samber/cc-skills",
+      "commit": "50a33836b20f690c668af557bd9ef9d07a8c7ef2",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design-deslop/SKILL.md",
+      "computedHash": "5723cf29b2fcbbd2f87b48ab796d36cabfcbfe8e7f7a29b7c0466bd208036b4d"
+    }
+  }
+}

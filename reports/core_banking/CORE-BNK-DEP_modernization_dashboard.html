@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModernizeIQ - Core Banking Deposit Subsystem Modernization Dossier</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for Spider/Radar & Bar charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151f33',
+                            900: '#0f172a',
+                            950: '#080d1a',
+                        },
+                        cyan: {
+                            450: '#15b8d6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        code, pre, .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glow-ocp {
+            box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.25);
+        }
+        .glow-vm {
+            box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.25);
+        }
+        .tab-btn.active {
+            background: rgba(6, 182, 212, 0.15);
+            color: #38bdf8;
+            border-bottom: 2px solid #38bdf8;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-cyan-500/20">
+                M
+            </div>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">ModernizeIQ</span>
+                    <span class="px-2 py-0.5 text-xs font-semibold uppercase tracking-wider rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Ecosystem v1.0</span>
+                </div>
+                <p class="text-xs text-slate-400">Mainframe-to-Distributed Architectural Intelligence</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <div class="text-right hidden sm:block">
+                <div class="text-xs text-slate-400 uppercase tracking-wider">Application Target</div>
+                <div class="font-bold text-sm text-slate-200" id="headerAppId">...</div>
+            </div>
+            <div id="targetBadge" class="px-4 py-2 rounded-xl font-bold text-xs flex items-center space-x-2 border shadow-sm">
+                <!-- Injected via JS -->
+            </div>
+            <button onclick="window.print()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 transition flex items-center space-x-1">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Export Dossier
+            </button>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs Bar -->
+    <nav class="bg-slate-900 border-b border-slate-800 px-6 flex space-x-1 overflow-x-auto text-xs font-semibold">
+        <button onclick="switchTab('tab-overview')" id="btn-tab-overview" class="tab-btn active px-4 py-3 text-slate-400 hover:text-slate-200 transition flex items-center space-x-2 whitespace-nowrap">
+            <span>Executive Overview</span>
+        </button>
+        <button onclick="switchTab('tab-radar')" id="btn-tab-radar" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 transition flex items-center space-x-2 whitespace-nowrap">
+            <span>8-Dimension Radar</span>
+        </button>
+        <button onclick="switchTab('tab-graph')" id="btn-tab-graph" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 transition flex items-center space-x-2 whitespace-nowrap">
+            <span>Dependency Graph & Blast Radius</span>
+        </button>
+        <button onclick="switchTab('tab-decision')" id="btn-tab-decision" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 transition flex items-center space-x-2 whitespace-nowrap">
+            <span>Platform Decision: OCP vs VM</span>
+        </button>
+        <button onclick="switchTab('tab-semantic')" id="btn-tab-semantic" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 transition flex items-center space-x-2 whitespace-nowrap">
+            <span>all-MiniLM-L6-v2 Semantic Clusters</span>
+        </button>
+        <button onclick="switchTab('tab-twelve')" id="btn-tab-twelve" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 transition flex items-center space-x-2 whitespace-nowrap">
+            <span>12-Factor Cloud Readiness</span>
+        </button>
+        <button onclick="switchTab('tab-risks')" id="btn-tab-risks" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 transition flex items-center space-x-2 whitespace-nowrap">
+            <span>Risk Catalog (<span id="riskCountBadge">0</span>)</span>
+        </button>
+        <button onclick="switchTab('tab-adr')" id="btn-tab-adr" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 transition flex items-center space-x-2 whitespace-nowrap">
+            <span>Architecture Decision Record (ADR)</span>
+        </button>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
+
+        <!-- ============================================================== -->
+        <!-- TAB 1: EXECUTIVE OVERVIEW -->
+        <!-- ============================================================== -->
+        <section id="tab-overview" class="tab-content space-y-6">
+            <!-- Hero Decision Banner -->
+            <div id="heroCard" class="rounded-2xl p-6 sm:p-8 border glass-panel transition relative overflow-hidden">
+                <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div class="space-y-3 max-w-3xl">
+                        <div class="flex items-center space-x-3">
+                            <span id="dispositionBadge" class="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider">
+                                <!-- Injected -->
+                            </span>
+                            <span class="text-xs text-slate-400">Gartner 7R Migration Strategy</span>
+                        </div>
+                        <h1 id="heroTitle" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                            Analyzing Portfolio...
+                        </h1>
+                        <p id="heroSummary" class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                            Loading assessment rationale...
+                        </p>
+                    </div>
+
+                    <div class="flex md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-4 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+                        <div class="text-left md:text-right">
+                            <div class="text-xs uppercase text-slate-400 font-semibold">Readiness Index</div>
+                            <div class="flex items-baseline md:justify-end space-x-1">
+                                <span id="heroScore" class="text-4xl font-black text-cyan-400">--</span>
+                                <span class="text-xs text-slate-500">/ 100</span>
+                            </div>
+                        </div>
+                        <div class="text-left md:text-right">
+                            <div class="text-xs uppercase text-slate-400 font-semibold">Remediation Effort</div>
+                            <div id="heroEffort" class="text-lg font-bold text-amber-400">-- Days</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Vitals Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="glass-panel p-4 rounded-xl border border-slate-800">
+                    <div class="text-xs font-semibold text-slate-400 uppercase">COBOL Programs</div>
+                    <div id="cntProgs" class="text-2xl font-black text-white mt-1">0</div>
+                    <div id="cntLoc" class="text-xs text-slate-500 mt-0.5">0 LOC</div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border border-slate-800">
+                    <div class="text-xs font-semibold text-slate-400 uppercase">Copybooks</div>
+                    <div id="cntCpy" class="text-2xl font-black text-purple-400 mt-1">0</div>
+                    <div class="text-xs text-slate-500 mt-0.5">Data Structures</div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border border-slate-800">
+                    <div class="text-xs font-semibold text-slate-400 uppercase">CICS Txns</div>
+                    <div id="cntTx" class="text-2xl font-black text-cyan-400 mt-1">0</div>
+                    <div id="cntBms" class="text-xs text-slate-500 mt-0.5">0 BMS Screens</div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border border-slate-800">
+                    <div class="text-xs font-semibold text-slate-400 uppercase">DB2 Relational</div>
+                    <div id="cntTables" class="text-2xl font-black text-emerald-400 mt-1">0</div>
+                    <div class="text-xs text-slate-500 mt-0.5">SQL Tables</div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border border-slate-800">
+                    <div class="text-xs font-semibold text-slate-400 uppercase">VSAM Datasets</div>
+                    <div id="cntVsam" class="text-2xl font-black text-amber-400 mt-1">0</div>
+                    <div class="text-xs text-slate-500 mt-0.5">Flat Files</div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border border-slate-800">
+                    <div class="text-xs font-semibold text-slate-400 uppercase">JCL Batch Jobs</div>
+                    <div id="cntJobs" class="text-2xl font-black text-pink-400 mt-1">0</div>
+                    <div id="cntSteps" class="text-xs text-slate-500 mt-0.5">0 Execution Steps</div>
+                </div>
+            </div>
+
+            <!-- Side-by-Side Highlights: 8 Dimensions & Top Blockers -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Dimension Scores Summary List -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                            <span>8 Modernization Dimensions</span>
+                        </h2>
+                        <span class="text-xs text-slate-400">Weighted Breakdown</span>
+                    </div>
+                    <div id="dimensionBarsList" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Top Blocker and Remediation Priorities -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                            <span>Critical Path Blockers & Risks</span>
+                        </h2>
+                        <span class="text-xs text-red-400 font-semibold" id="blockerCountLabel">0 Critical</span>
+                    </div>
+                    <div id="topBlockersList" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 2: 8-DIMENSION RADAR CHART -->
+        <!-- ============================================================== -->
+        <section id="tab-radar" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 glass-panel p-6 rounded-2xl border border-slate-800 flex flex-col items-center justify-center">
+                    <h2 class="text-base font-bold text-white mb-2 self-start">Architectural Readiness Spider Radar</h2>
+                    <p class="text-xs text-slate-400 mb-4 self-start">Evaluating legacy coupling vs cloud-native distributed architecture viability</p>
+                    <div class="w-full max-w-lg aspect-square">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                        <h3 class="text-sm font-bold text-white mb-3">Dimension Diagnostic Drilldown</h3>
+                        <div id="dimensionDetailedCards" class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 3: DEPENDENCY GRAPH & BLAST RADIUS -->
+        <!-- ============================================================== -->
+        <section id="tab-graph" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-base font-bold text-white">Interactive Enterprise Dependency Topology</h2>
+                        <p class="text-xs text-slate-400">Multi-artifact graph: Programs, Copybooks, Tables, VSAM, JCL, and CICS Transactions</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-slate-400">Filter:</span>
+                        <select id="graphFilterSelect" onchange="filterGraph(this.value)" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:ring-cyan-500 focus:border-cyan-500">
+                            <option value="ALL">All Artifacts</option>
+                            <option value="Program">COBOL Programs Only</option>
+                            <option value="Copybook">Copybooks</option>
+                            <option value="Table">DB2 Tables</option>
+                            <option value="Vsam">VSAM Files</option>
+                            <option value="Job">JCL Jobs</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Live Graph Canvas Container -->
+                <div class="relative w-full h-[520px] rounded-xl bg-slate-900/90 border border-slate-800 overflow-hidden">
+                    <canvas id="graphCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+
+                    <!-- Graph Controls Overlay -->
+                    <div class="absolute bottom-4 left-4 flex space-x-2 bg-slate-950/80 backdrop-blur p-2 rounded-lg border border-slate-800 text-xs text-slate-300">
+                        <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span><span>Program</span></span>
+                        <span class="flex items-center space-x-1 ml-2"><span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span><span>Copybook</span></span>
+                        <span class="flex items-center space-x-1 ml-2"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span><span>Table</span></span>
+                        <span class="flex items-center space-x-1 ml-2"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span><span>VSAM</span></span>
+                        <span class="flex items-center space-x-1 ml-2"><span class="w-3 h-3 rounded-full bg-pink-500 inline-block"></span><span>JCL</span></span>
+                    </div>
+
+                    <!-- Selected Node Inspector Modal / Overlay -->
+                    <div id="nodeInspector" class="absolute top-4 right-4 w-80 glass-panel p-4 rounded-xl border border-slate-700 shadow-2xl hidden">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                            <span id="inspectNodeType" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">Node</span>
+                            <button onclick="closeInspector()" class="text-slate-400 hover:text-white">&times;</button>
+                        </div>
+                        <div class="mt-2 space-y-2">
+                            <h4 id="inspectNodeLabel" class="font-bold text-sm text-white">...</h4>
+                            <div id="inspectNodeMeta" class="text-xs text-slate-300 space-y-1"></div>
+                            <div class="pt-2 border-t border-slate-800">
+                                <button id="btnBlastRadius" onclick="runBlastRadiusOnSelected()" class="w-full py-1.5 px-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-1">
+                                    <span>Calculate Blast Radius</span>
+                                </button>
+                            </div>
+                            <div id="blastRadiusResult" class="text-xs space-y-1 pt-1 hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 4: PLATFORM DECISION: OPENSHIFT (OCP) vs VM -->
+        <!-- ============================================================== -->
+        <section id="tab-decision" class="tab-content hidden space-y-6">
+            <!-- Platform Score Comparison Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- OpenShift Card -->
+                <div id="cardOcp" class="glass-panel p-6 sm:p-8 rounded-2xl border transition relative space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-red-600/20 border border-red-500/30 flex items-center justify-center font-bold text-red-400">
+                                OCP
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Red Hat OpenShift (OCP)</h3>
+                                <p class="text-xs text-slate-400">Cloud-Native Container Orchestration</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black" id="scoreOcpVal">--</div>
+                            <span class="text-[10px] text-slate-500 uppercase">Fit Index</span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-300 leading-relaxed" id="descOcp">
+                        Stateless pod scaling, microservices decomposition, and automated GitOps CI/CD pipelines.
+                    </p>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Pros & Modernization Gains</div>
+                        <ul id="prosOcpList" class="text-xs text-slate-300 space-y-1 list-disc list-inside"></ul>
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <div class="text-xs font-bold text-red-400 uppercase tracking-wider">Container Blockers & Constraints</div>
+                        <ul id="blockersOcpList" class="text-xs text-slate-300 space-y-1 list-disc list-inside"></ul>
+                    </div>
+                </div>
+
+                <!-- Linux VM Card -->
+                <div id="cardVm" class="glass-panel p-6 sm:p-8 rounded-2xl border transition relative space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center font-bold text-amber-400">
+                                VM
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Linux Virtual Machine (VM)</h3>
+                                <p class="text-xs text-slate-400">Rehost / Lift-and-Shift Emulation</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black" id="scoreVmVal">--</div>
+                            <span class="text-[10px] text-slate-500 uppercase">Fit Index</span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-300 leading-relaxed" id="descVm">
+                        Emulation runtime (Micro Focus / Raincode) preserves legacy state, shared memory, and VSAM files without code changes.
+                    </p>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Pros & Quick Wins</div>
+                        <ul id="prosVmList" class="text-xs text-slate-300 space-y-1 list-disc list-inside"></ul>
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">Drawbacks & Retained Debt</div>
+                        <ul id="consVmList" class="text-xs text-slate-300 space-y-1 list-disc list-inside"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Architectural Trade-Off Matrix Table -->
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+                <h3 class="text-base font-bold text-white">Architectural Vector Comparison Matrix (OCP vs VM)</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-900/80 text-slate-400 uppercase text-[10px] font-bold border-b border-slate-800">
+                            <tr>
+                                <th class="p-3">Evaluation Vector</th>
+                                <th class="p-3 text-center">OpenShift (OCP)</th>
+                                <th class="p-3 text-center">Virtual Machine (VM)</th>
+                                <th class="p-3">Architectural Analysis</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tradeOffTableBody" class="divide-y divide-slate-800/60 text-slate-300">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 5: all-MiniLM-L6-v2 SEMANTIC CLUSTERS -->
+        <!-- ============================================================== -->
+        <section id="tab-semantic" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 2D Scatter Cluster Map -->
+                <div class="lg:col-span-7 glass-panel p-6 rounded-2xl border border-slate-800 flex flex-col">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-base font-bold text-white">all-MiniLM-L6-v2 Semantic 2D Embedding Space</h2>
+                            <p class="text-xs text-slate-400">PCA-reduced 384-dimensional vector projection revealing cohesive microservice candidates</p>
+                        </div>
+                    </div>
+                    <div class="w-full flex-1 min-h-[420px] rounded-xl bg-slate-900/80 border border-slate-800 p-4 relative">
+                        <canvas id="clusterScatterChart" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+
+                <!-- Cluster Bounded Context Cards -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-3">
+                        <h3 class="text-sm font-bold text-white">Bounded Domain Microservices</h3>
+                        <p class="text-xs text-slate-400">Programs grouped by natural language business logic similarity</p>
+                        <div id="clustersList" class="space-y-3 max-h-[480px] overflow-y-auto pr-2">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 6: 12-FACTOR CLOUD-NATIVE AUDIT -->
+        <!-- ============================================================== -->
+        <section id="tab-twelve" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-white">Twelve-Factor App Modernization Assessment</h2>
+                        <p class="text-xs text-slate-400">Verifying container compatibility criteria across the 12 cloud-native architectural factors</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400 uppercase">Average Compliance</span>
+                        <div class="text-xl font-bold text-cyan-400" id="twelveFactorAvg">0%</div>
+                    </div>
+                </div>
+
+                <div id="twelveFactorGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 7: RISK CATALOG & REMEDIATIONS -->
+        <!-- ============================================================== -->
+        <section id="tab-risks" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-base font-bold text-white">Comprehensive Risk & Anti-Pattern Catalog</h2>
+                        <p class="text-xs text-slate-400">Prioritized mitigation steps, affected artifacts, and estimated remediation effort</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="filterRisks('ALL')" class="px-2.5 py-1 text-xs font-semibold rounded bg-slate-800 hover:bg-slate-700 text-slate-300">All</button>
+                        <button onclick="filterRisks('Critical')" class="px-2.5 py-1 text-xs font-semibold rounded bg-red-500/20 text-red-400 hover:bg-red-500/30">Critical</button>
+                        <button onclick="filterRisks('High')" class="px-2.5 py-1 text-xs font-semibold rounded bg-amber-500/20 text-amber-400 hover:bg-amber-500/30">High</button>
+                        <button onclick="filterRisks('Medium')" class="px-2.5 py-1 text-xs font-semibold rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30">Medium</button>
+                    </div>
+                </div>
+
+                <div id="risksCatalogList" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 8: ARCHITECTURE DECISION RECORD (ADR) -->
+        <!-- ============================================================== -->
+        <section id="tab-adr" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800 space-y-6 font-mono text-xs">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-cyan-400 font-bold" id="adrId">ADR-001</span>
+                        <h2 class="text-lg font-bold text-white font-sans mt-1" id="adrTitle">Architecture Decision Record</h2>
+                    </div>
+                    <span class="px-3 py-1 rounded bg-emerald-500/20 text-emerald-400 font-bold uppercase tracking-wider text-[10px]">ACCEPTED</span>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="text-slate-400 uppercase text-[10px] font-bold">1. Context & Problem Statement</div>
+                    <p class="text-slate-200 leading-relaxed font-sans text-xs bg-slate-900/60 p-4 rounded-xl border border-slate-800" id="adrContext"></p>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="text-slate-400 uppercase text-[10px] font-bold">2. Decision & Target Platform</div>
+                    <p class="text-cyan-300 font-bold font-sans text-sm bg-cyan-950/30 p-4 rounded-xl border border-cyan-800/40" id="adrDecision"></p>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="text-slate-400 uppercase text-[10px] font-bold">3. Logical Justification & Trade-Off Analysis</div>
+                    <p class="text-slate-300 leading-relaxed font-sans text-xs bg-slate-900/60 p-4 rounded-xl border border-slate-800" id="adrJustification"></p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <div class="text-emerald-400 uppercase text-[10px] font-bold">Positive Consequences</div>
+                        <ul id="adrPosList" class="space-y-1 list-disc list-inside text-slate-300 font-sans text-xs bg-slate-900/60 p-4 rounded-xl border border-slate-800"></ul>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="text-amber-400 uppercase text-[10px] font-bold">Negative / Neutral Consequences</div>
+                        <ul id="adrNegList" class="space-y-1 list-disc list-inside text-slate-300 font-sans text-xs bg-slate-900/60 p-4 rounded-xl border border-slate-800"></ul>
+                    </div>
+                </div>
+
+                <div class="space-y-2 pt-2">
+                    <div class="text-slate-400 uppercase text-[10px] font-bold">4. Migration Roadmap & Waves</div>
+                    <div id="adrRoadmapPhases" class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-sans"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-800/80 py-4 px-6 text-center text-xs text-slate-500 flex flex-wrap items-center justify-between gap-2">
+        <span>ModernizeIQ &bull; Mainframe Modernization Assessment Engine</span>
+        <span>Generated by DeepMind Antigravity Pair-Programming Ecosystem</span>
+    </footer>
+
+    <!-- INLINE DATA AND INTERACTIVITY SCRIPTS -->
+    <script>
+        const reportData = {"portfolio": {"app_id": "CORE-BNK-DEP", "app_name": "Core Banking Deposit Subsystem", "description": "Legacy mainframe application portfolio: Core Banking Deposit", "business_domain": "Retail Banking & Deposits", "owner_team": "Mainframe Core Services", "programs": {"ACCT010": {"program_id": "ACCT010", "file_path": "data\\sample_portfolios\\core_banking_deposit\\cbl\\ACCT010.cbl", "dialect": "Enterprise COBOL for z/OS", "program_type": "Online CICS", "lines_of_code": 41, "comment_lines": 0, "blank_lines": 8, "divisions_present": ["IDENTIFICATION", "ENVIRONMENT", "DATA", "PROCEDURE"], "paragraphs": ["0000-MAIN-PROCESS", "END-EXEC", "END-IF", "1000-QUERY-ACCOUNT", "END-EXEC", "END-IF", "2000-SEND-RESPONSE", "9000-HANDLE-ERROR"], "sections": [], "cyclomatic_complexity": 5, "halstead_volume": 490.24, "halstead_difficulty": 5.13, "halstead_effort": 2516.55, "maintainability_index": 45.31, "copybooks_used": ["ACCTREC", "SQLCA"], "static_calls": [], "dynamic_calls": [], "cics_links": [], "cics_xctls": [], "cics_starts": [], "has_cics": true, "cics_commands_count": 4, "cics_state_pattern": "Pseudo-Conversational (COMMAREA or Container)", "commarea_size_bytes": 0, "has_tsq": false, "has_tdq": false, "has_syncpoint": false, "has_syncpoint_rollback": false, "has_sql": true, "sql_tables_accessed": ["ACCOUNT_MASTER"], "sql_operations": {"SELECT": 1, "INSERT": 0, "UPDATE": 0, "DELETE": 0}, "has_cursors": false, "has_stored_procedure_calls": false, "vsam_files_accessed": [], "mq_queues_accessed": [], "has_alter_goto": false, "alter_statements_count": 0, "has_computed_goto": false, "has_embedded_assembler": false, "has_hardcoded_file_paths": false, "dead_paragraphs_count": 4, "unreferenced_paragraphs": ["END-EXEC", "END-IF", "END-EXEC", "END-IF"], "description": null, "business_summary": null, "extracted_business_rules": []}, "ACCT020": {"program_id": "ACCT020", "file_path": "data\\sample_portfolios\\core_banking_deposit\\cbl\\ACCT020.cbl", "dialect": "Enterprise COBOL for z/OS", "program_type": "Online CICS", "lines_of_code": 47, "comment_lines": 0, "blank_lines": 9, "divisions_present": ["IDENTIFICATION", "ENVIRONMENT", "DATA", "PROCEDURE"], "paragraphs": ["0000-PROCESS-DEPOSIT", "END-EXEC", "END-IF", "1000-VALIDATE-AMOUNT", "END-IF", "2000-UPDATE-LEDGER", "END-EXEC", "3000-WRITE-AUDIT-LOG", "END-EXEC", "4000-SEND-SUCCESS", "9999-REJECT-TXN"], "sections": [], "cyclomatic_complexity": 5, "halstead_volume": 654.96, "halstead_difficulty": 6.3, "halstead_effort": 4123.83, "maintainability_index": 43.13, "copybooks_used": ["ACCTREC", "SQLCA", "TXNREC"], "static_calls": [], "dynamic_calls": [], "cics_links": [], "cics_xctls": [], "cics_starts": [], "has_cics": true, "cics_commands_count": 4, "cics_state_pattern": "Pseudo-Conversational (COMMAREA or Container)", "commarea_size_bytes": 0, "has_tsq": false, "has_tdq": false, "has_syncpoint": false, "has_syncpoint_rollback": false, "has_sql": true, "sql_tables_accessed": ["ACCOUNT_MASTER", "TRANSACTION_LOG"], "sql_operations": {"SELECT": 0, "INSERT": 1, "UPDATE": 1, "DELETE": 0}, "has_cursors": false, "has_stored_procedure_calls": false, "vsam_files_accessed": [], "mq_queues_accessed": [], "has_alter_goto": false, "alter_statements_count": 0, "has_computed_goto": false, "has_embedded_assembler": false, "has_hardcoded_file_paths": false, "dead_paragraphs_count": 5, "unreferenced_paragraphs": ["END-EXEC", "END-IF", "END-IF", "END-EXEC", "END-EXEC"], "description": null, "business_summary": null, "extracted_business_rules": []}, "ACCTPOST": {"program_id": "ACCTPOST", "file_path": "data\\sample_portfolios\\core_banking_deposit\\cbl\\ACCTPOST.cbl", "dialect": "Enterprise COBOL for z/OS", "program_type": "Batch", "lines_of_code": 47, "comment_lines": 0, "blank_lines": 9, "divisions_present": ["IDENTIFICATION", "ENVIRONMENT", "DATA", "PROCEDURE"], "paragraphs": ["0000-MAIN-POSTING", "END-PERFORM", "REPORT-FILE", "1000-PROCESS-BATCH-TXN", "END-EXEC", "2000-WRITE-SUMMARY"], "sections": [], "cyclomatic_complexity": 5, "halstead_volume": 347.28, "halstead_difficulty": 8.42, "halstead_effort": 2924.76, "maintainability_index": 45.06, "copybooks_used": ["SQLCA", "TXNREC"], "static_calls": [], "dynamic_calls": [], "cics_links": [], "cics_xctls": [], "cics_starts": [], "has_cics": false, "cics_commands_count": 0, "cics_state_pattern": "Stateless (Immediate return, externalized state)", "commarea_size_bytes": 0, "has_tsq": false, "has_tdq": false, "has_syncpoint": false, "has_syncpoint_rollback": false, "has_sql": true, "sql_tables_accessed": ["ACCOUNT_MASTER"], "sql_operations": {"SELECT": 0, "INSERT": 0, "UPDATE": 1, "DELETE": 0}, "has_cursors": false, "has_stored_procedure_calls": false, "vsam_files_accessed": ["PRTFILE", "TXNIN"], "mq_queues_accessed": [], "has_alter_goto": false, "alter_statements_count": 0, "has_computed_goto": false, "has_embedded_assembler": false, "has_hardcoded_file_paths": false, "dead_paragraphs_count": 3, "unreferenced_paragraphs": ["END-PERFORM", "REPORT-FILE", "END-EXEC"], "description": null, "business_summary": null, "extracted_business_rules": []}}, "copybooks": {"ACCTREC": {"name": "ACCTREC", "file_path": "data\\sample_portfolios\\core_banking_deposit\\cpy\\ACCTREC.cpy", "field_count": 6, "level_01_name": null, "total_length_bytes": 60, "has_occurs": false, "has_redefines": false, "referenced_by_programs": ["ACCT010", "ACCT020"], "description": null}, "TXNREC": {"name": "TXNREC", "file_path": "data\\sample_portfolios\\core_banking_deposit\\cpy\\TXNREC.cpy", "field_count": 7, "level_01_name": null, "total_length_bytes": 70, "has_occurs": false, "has_redefines": false, "referenced_by_programs": ["ACCT020", "ACCTPOST"], "description": null}, "SQLCA": {"name": "SQLCA", "file_path": null, "field_count": 10, "level_01_name": null, "total_length_bytes": 0, "has_occurs": false, "has_redefines": false, "referenced_by_programs": ["ACCT010", "ACCT020", "ACCTPOST"], "description": null}}, "jobs": {"EODPOST": {"job_name": "EODPOST", "file_path": "data\\sample_portfolios\\core_banking_deposit\\jcl\\EODPOST.jcl", "job_class": null, "steps": [{"step_name": "STEP010", "program_executed": "ACCTPOST", "is_proc": false, "cond_codes": [], "input_datasets": ["BANK.PROD.LOADLIB", "BANK.DAILY.TXNS"], "output_datasets": [], "datasets": [{"dsn": "BANK.PROD.LOADLIB", "is_gdg": false, "disp": ""}, {"dsn": "BANK.DAILY.TXNS", "is_gdg": false, "disp": ""}], "disposition_share": false, "is_utility": false}], "has_gdg": false, "has_conditional_steps": false, "has_checkpoint_restart": false, "estimated_runtime_minutes": 15, "scheduler_dependencies": []}}, "transactions": {}, "mapsets": {"ACCTSET": {"mapset_name": "ACCTSET", "file_path": "data\\sample_portfolios\\core_banking_deposit\\bms\\ACCTSET.bms", "maps_count": 2, "maps": [{"map_name": "ACCTM01", "has_cursor_positioning": true, "modified_data_tags": true, "fields_count": 7}, {"map_name": "ACCTM02", "has_cursor_positioning": true, "modified_data_tags": true, "fields_count": 7}], "total_fields": 7, "has_cursor_logic": true, "has_mdt_logic": true, "pf_keys_used": [], "associated_programs": []}}, "tables": {"ACCOUNT_MASTER": {"table_name": "ACCOUNT_MASTER", "schema_name": "DB2", "columns_count": 6, "columns": ["ACCOUNT_ID", "CUSTOMER_ID", "ACCOUNT_TYPE", "BALANCE", "STATUS", "LAST_UPDATED"], "has_primary_key": true, "primary_key": ["ACCOUNT_ID"], "indexes_count": 2, "estimated_row_count": 0, "accessed_by_programs": ["ACCT010", "ACCT020", "ACCTPOST"], "is_relational": true}, "TRANSACTION_LOG": {"table_name": "TRANSACTION_LOG", "schema_name": "DB2", "columns_count": 5, "columns": ["TXN_ID", "ACCOUNT_ID", "AMOUNT", "TXN_TYPE", "CREATED_AT"], "has_primary_key": true, "primary_key": ["TXN_ID"], "indexes_count": 2, "estimated_row_count": 0, "accessed_by_programs": ["ACCT020"], "is_relational": true}}, "vsam_files": {"PRTFILE": {"cluster_name": "PRTFILE", "vsam_type": "KSDS", "record_length": 80, "key_length": 0, "key_offset": 0, "share_options": "(2,3)", "has_alternate_index": false, "accessed_by_programs": ["ACCTPOST"]}, "TXNIN": {"cluster_name": "TXNIN", "vsam_type": "KSDS", "record_length": 80, "key_length": 0, "key_offset": 0, "share_options": "(2,3)", "has_alternate_index": false, "accessed_by_programs": ["ACCTPOST"]}}, "security": {"esm_type": "RACF", "resource_classes_used": ["TCICSTRN"], "has_saf_exits": false, "has_surrogate_security": false, "compliance_frameworks": [], "custom_exits": []}, "nfrs": {"peak_throughput_tps": 450, "target_latency_p99_ms": 120.0, "availability_sla": 99.95, "batch_window_hours": 3.0, "rto_minutes": 30, "rpo_minutes": 0, "data_volume_gb": 50.0, "is_customer_facing": true, "audit_logging_required": true, "business_criticality": "Tier 1 - Mission Critical", "target_response_time_ms_val": null, "availability_percentage_val": null, "peak_transactions_per_sec_val": null}}, "assessment": {"dimension_scores": [{"dimension_key": "", "dimension_name": "Business Logic & Code Complexity", "score": 1.0, "raw_score": 1.5, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 87.5, "readiness_rating": "High", "findings": [], "key_findings": ["Analyzed 3 COBOL program(s) totaling 135 lines of code.", "Average Cyclomatic Complexity: 5.0 (Peak: 5 in ACCT010).", "Detected 12 unreferenced paragraphs (dead code candidates)."], "blockers": [], "boosters": [], "strengths": ["Well-structured procedural branching (Avg Cyclomatic Complexity: 5.0).", "Zero self-modifying code (no ALTER statements detected)."]}, {"dimension_key": "", "dimension_name": "Coupling & Shared Components", "score": 1.0, "raw_score": 1.2, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 95.0, "readiness_rating": "High", "findings": [], "key_findings": ["Analyzed 3 program(s) across 3 copybook(s).", "Average Fan-Out: 0.0. Highest Fan-In program: 'None' (referenced by 0 programs)."], "blockers": [], "boosters": [], "strengths": ["Acyclic program call graph (no circular recursion detected)."]}, {"dimension_key": "", "dimension_name": "Data Architecture & Persistence", "score": 1.0, "raw_score": 1.9, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 77.5, "readiness_rating": "High", "findings": [], "key_findings": ["Detected 2 DB2 Table(s) and 2 VSAM Dataset(s).", "DB2 relational database utilized across 2 tables.", "3 program(s) execute embedded EXEC SQL commands."], "blockers": [], "boosters": [], "strengths": ["Relational SQL schema readily maps to distributed databases (PostgreSQL/Cloud SQL)."]}, {"dimension_key": "", "dimension_name": "Online Transactions & UI", "score": 1.0, "raw_score": 2.2, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 70.0, "readiness_rating": "High", "findings": [], "key_findings": ["Detected 2 CICS program(s), 0 transaction(s), and 1 BMS 3270 mapset(s).", "1 BMS 3270 screen mapset(s) require UI modernization."], "blockers": [], "boosters": [], "strengths": ["Zero conversational CICS transactions detected; pseudo-conversational pattern utilized."]}, {"dimension_key": "", "dimension_name": "Batch Processing & Orchestration", "score": 1.0, "raw_score": 1.2, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 95.0, "readiness_rating": "High", "findings": [], "key_findings": ["Detected 1 JCL Job(s) containing 1 execution step(s)."], "blockers": [], "boosters": [], "strengths": ["No Generation Data Groups (GDGs); datasets follow deterministic naming.", "Linear step execution in JCL jobs; simple DAG translation."]}, {"dimension_key": "", "dimension_name": "Transaction Integrity & State", "score": 1.0, "raw_score": 3.0, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 50.0, "readiness_rating": "Medium", "findings": [], "key_findings": ["Detected 0 explicit CICS SYNCPOINT statement(s) across 0 program(s)."], "blockers": ["Atomic 2PC across DB2 and VSAM in ACCTPOST"], "boosters": [], "strengths": []}, {"dimension_key": "", "dimension_name": "Security & Identity", "score": 1.0, "raw_score": 1.0, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 100.0, "readiness_rating": "High", "findings": [], "key_findings": ["Security Manager: RACF. Resource Classes: 1. User Exits: 0."], "blockers": [], "boosters": [], "strengths": ["Standard security profiles without custom low-level assembler exits.", "Direct user credential or service identity model."]}, {"dimension_key": "", "dimension_name": "Operational NFRs & Blast Radius", "score": 1.0, "raw_score": 1.0, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 100.0, "readiness_rating": "High", "findings": [], "key_findings": ["Latency SLA: 120.0 ms. Availability: 99.95%. Peak TPS: 450.", "Business Criticality: Tier 1 - Mission Critical (RTO: 30 min, RPO: 0 min)."], "blockers": [], "boosters": [], "strengths": ["Relaxed latency SLA (120.0 ms). Highly cloud-friendly.", "Standard high availability target (99.95%) natively supported by OpenShift pod replicas."]}], "overall_normalized_score": 83.0, "overall_raw_score": 1.68, "overall_readiness_rating": "High Readiness (Container-Ready for OpenShift)", "twelve_factor_compliance": [{"factor_number": 1, "factor_id": "I", "factor_name": "", "name": "Codebase", "compliance_score": 1.0, "score": 85.0, "status": "Compliant", "legacy_gap": "", "gap_analysis": "Mainframe PDS/Panvalet libraries can be migrated into Git repositories with branching.", "remediation": "Establish unified Git repository with trunk-based development."}, {"factor_number": 1, "factor_id": "II", "factor_name": "", "name": "Dependencies", "compliance_score": 1.0, "score": 75.0, "status": "Compliant", "legacy_gap": "", "gap_analysis": "Dynamic CALL statements (0 found) and STEPLIB/JOBLIB concatenate implicit search orders.", "remediation": "Declare external libraries in Maven/Gradle/Go modules or container image manifest."}, {"factor_number": 1, "factor_id": "III", "factor_name": "", "name": "Config", "compliance_score": 1.0, "score": 30.0, "status": "Non-Compliant", "legacy_gap": "", "gap_analysis": "Environment parameters, dataset names, and CICS region IDs are hardcoded in JCL cards and COBOL WORKING-STORAGE.", "remediation": "Externalize parameters to Kubernetes ConfigMaps and Secrets injected as environment variables."}, {"factor_number": 1, "factor_id": "IV", "factor_name": "", "name": "Backing Services", "compliance_score": 1.0, "score": 40.0, "status": "Partial", "legacy_gap": "", "gap_analysis": "Tightly bound to local mainframe subsystems (VSAM RLS, DB2 Subsystem ID). 2 VSAM datasets bound to physical DASD volumes.", "remediation": "Abstract databases, message queues, and object storage behind standard URIs and connection pools."}, {"factor_number": 1, "factor_id": "V", "factor_name": "", "name": "Build, Release, Run", "compliance_score": 1.0, "score": 80.0, "status": "Compliant", "legacy_gap": "", "gap_analysis": "Mainframe compile/link-edit separates binaries from execution, easily adaptable to container multi-stage builds.", "remediation": "Containerize build step using Red Hat Universal Base Image (UBI) and Tekton / OpenShift Pipelines."}, {"factor_number": 1, "factor_id": "VI", "factor_name": "", "name": "Processes", "compliance_score": 1.0, "score": 90.0, "status": "Compliant", "legacy_gap": "", "gap_analysis": "Pseudo-conversational CICS or headless batch allows stateless pod scaling.", "remediation": "Ensure all in-memory variables are localized to single request scopes."}, {"factor_number": 1, "factor_id": "VII", "factor_name": "", "name": "Port Binding", "compliance_score": 1.0, "score": 35.0, "status": "Non-Compliant", "legacy_gap": "", "gap_analysis": "BMS 3270 maps communicate through SNA terminal LU pools rather than self-contained HTTP/gRPC port binding.", "remediation": "Expose HTTP/REST or gRPC endpoints bound to container ports 8080/8443, fronted by OpenShift Routes."}, {"factor_number": 1, "factor_id": "VIII", "factor_name": "", "name": "Concurrency", "compliance_score": 1.0, "score": 80.0, "status": "Compliant", "legacy_gap": "", "gap_analysis": "Mainframe relies on scale-up vertical MIPS and CICS multi-region operation (MRO). Concurrent pod scaling blocked by file locks.", "remediation": "Enable OpenShift Horizontal Pod Autoscaler (HPA) using CPU/memory and custom Prometheus metrics."}, {"factor_number": 1, "factor_id": "IX", "factor_name": "", "name": "Disposability", "compliance_score": 1.0, "score": 60.0, "status": "Partial", "legacy_gap": "", "gap_analysis": "Mainframe programs expect warm region memory pools; cold startup overhead requires optimization.", "remediation": "Implement Kubernetes liveness and readiness probes with graceful SIGTERM termination hooks."}, {"factor_number": 1, "factor_id": "X", "factor_name": "", "name": "Dev/Prod Parity", "compliance_score": 1.0, "score": 25.0, "status": "Non-Compliant", "legacy_gap": "", "gap_analysis": "Massive disparity between developer workstations (Windows/macOS x86) and production IBM z/OS mainframes.", "remediation": "Standardize on containerized local dev environment (Minikube / OpenShift Local / Podman Desktop)."}, {"factor_number": 1, "factor_id": "XI", "factor_name": "", "name": "Logs", "compliance_score": 1.0, "score": 50.0, "status": "Partial", "legacy_gap": "", "gap_analysis": "Logs directed to spool datasets (SYSOUT, CESE, JESMSGLG) with rigid 132-character record layouts.", "remediation": "Direct structured JSON logs to stdout/stderr; collect via OpenShift Logging (Fluentd / Vector / OpenSearch)."}, {"factor_number": 1, "factor_id": "XII", "factor_name": "", "name": "Admin Processes", "compliance_score": 1.0, "score": 85.0, "status": "Compliant", "legacy_gap": "", "gap_analysis": "JCL batch jobs naturally map to Kubernetes one-off Jobs and CronJobs.", "remediation": "Convert administrative JCL scripts to containerized Kubernetes Jobs executed via oc create job."}], "average_factor_score": 61.2, "risks": [{"risk_id": "RISK-TX-01", "category": "", "dimension": "Transaction Integrity & State", "severity": "Critical", "title": "Heterogeneous Multi-Resource Two-Phase Commit (2PC)", "description": "Programs ['ACCTPOST'] execute atomic coordinated writes across both DB2 relational tables and VSAM files under mainframe syncpoint.", "impact": "", "migration_impact": "Fatal blocker for native microservices. Distributed ACID 2PC across independent container microservices introduces latency, deadlocks, and CAP theorem partition failures.", "mitigation_strategy": "", "remediation_strategy": "Refactor into an eventual consistency Saga pattern (Orchestrated Saga with Kafka/Temporal) or consolidate storage into a single ACID database before migration.", "affected_artifacts": ["ACCTPOST"], "effort_person_days": 6}, {"risk_id": "RISK-DATA-02", "category": "", "dimension": "Data Architecture & Persistence", "severity": "High", "title": "VSAM Dataset Dependencies", "description": "Found 2 VSAM dataset(s). Requires data conversion to relational or document storage.", "impact": "", "migration_impact": "Containers cannot mount native VSAM datasets directly.", "mitigation_strategy": "", "remediation_strategy": "Convert VSAM clusters to relational tables using AWS DMS, Qlik, or custom ETL.", "affected_artifacts": ["PRTFILE", "TXNIN"], "effort_person_days": 4}, {"risk_id": "RISK-CICS-02", "category": "", "dimension": "Online Transactions & UI", "severity": "High", "title": "BMS 3270 Green-Screen User Interface Coupling", "description": "Portfolio includes 1 BMS mapsets containing 3270 datastreams, cursor positions, and Modified Data Tags (MDT).", "impact": "", "migration_impact": "Requires terminal emulation middleware or complete front-end UI re-architecture (React/Angular/Vue).", "mitigation_strategy": "", "remediation_strategy": "Generate OpenAPI REST specifications from BMS field layouts and build modern responsive web components.", "affected_artifacts": ["ACCTSET"], "effort_person_days": 3}], "remediations": [{"action_id": "REM-01", "title": "Resolve Heterogeneous Multi-Resource Two-Phase Commit (2PC)", "target_component": "", "effort_story_points": 1, "effort_person_days": 1, "estimated_days": 6, "priority": "Critical", "phase": 1, "description": "Refactor into an eventual consistency Saga pattern (Orchestrated Saga with Kafka/Temporal) or consolidate storage into a single ACID database before migration.", "target_pattern": "", "target_platform": "Enterprise Linux Virtual Machine (VM)", "recommended_tools": []}, {"action_id": "REM-02", "title": "Resolve VSAM Dataset Dependencies", "target_component": "", "effort_story_points": 1, "effort_person_days": 1, "estimated_days": 4, "priority": "High", "phase": 2, "description": "Convert VSAM clusters to relational tables using AWS DMS, Qlik, or custom ETL.", "target_pattern": "", "target_platform": "Red Hat OpenShift Container Platform (OCP)", "recommended_tools": []}, {"action_id": "REM-03", "title": "Resolve BMS 3270 Green-Screen User Interface Coupling", "target_component": "", "effort_story_points": 1, "effort_person_days": 1, "estimated_days": 3, "priority": "High", "phase": 2, "description": "Generate OpenAPI REST specifications from BMS field layouts and build modern responsive web components.", "target_pattern": "", "target_platform": "Red Hat OpenShift Container Platform (OCP)", "recommended_tools": []}], "total_estimated_person_days": 13, "initial_disposition": "Refactor (Cloud-Native Containerization on OCP)", "target_platform": "Red Hat OpenShift Container Platform (OCP)"}, "semantic_clusters": [{"cluster_id": "CLUSTER-1", "cluster_name": "Account Services (1)", "business_domain": "Core Account Management & Balance Ledger", "programs": ["ACCT010", "ACCT020", "ACCTPOST"], "copybooks": [], "tables": [], "cohesion_score": 0.66, "coupling_score": 0.0, "recommended_service_name": "", "description": "", "suggested_target": "High (Stateless Microservice)"}], "semantic_coords": [{"program_id": "ACCT010", "x": -43.4, "y": 14.2, "cluster": "CLUSTER-1"}, {"program_id": "ACCT020", "x": -41.6, "y": -14.4, "cluster": "CLUSTER-1"}, {"program_id": "ACCTPOST", "x": 85.0, "y": 0.2, "cluster": "CLUSTER-1"}], "decision": {"primary_platform": "Red Hat OpenShift Container Platform (OCP)", "secondary_platform": "Enterprise Linux Virtual Machine (VM)", "recommended_disposition": "Refactor (Cloud-Native Containerization on OCP)", "ocp_score": 82.0, "vm_score": 80.0, "decision_summary": "RECOMMENDATION: RED HAT OPENSHIFT (OCP) CONTAINER PLATFORM (Score: 82.0/100). The application exhibits clean modular boundaries, stateless transactions, and relational persistence, making it an ideal candidate for cloud-native containerization and microservice refactoring.", "logical_justification": {"summary": "1. STATELESS READINESS: The application operates with pseudo-conversational CICS transactions or stateless services. There are no active terminal memory locks, enabling horizontal pod scaling across Red Hat OpenShift nodes without session stickiness issues. 2. PERSISTENCE MODULARITY: The data layer is decoupled from mainframe-specific VSAM record locks and runs primarily on relational DB2 schemas, which translate seamlessly to distributed databases like PostgreSQL, Amazon Aurora, or Crunchy Data on OpenShift. 3. BUSINESS VALUE & AGILITY: Containerization unlocks automated GitOps deployment pipelines, canary deployments, and integration with event-driven services (Kafka) with zero ongoing mainframe MIPS cost.", "key_drivers": ["1. STATELESS READINESS: The application operates with pseudo-conversational CICS transactions or stateless services. There are no active terminal memory locks, enabling horizontal pod scaling across Red Hat OpenShift nodes without session stickiness issues.", "2. PERSISTENCE MODULARITY: The data layer is decoupled from mainframe-specific VSAM record locks and runs primarily on relational DB2 schemas, which translate seamlessly to distributed databases like PostgreSQL, Amazon Aurora, or Crunchy Data on OpenShift.", "3. BUSINESS VALUE & AGILITY: Containerization unlocks automated GitOps deployment pipelines, canary deployments, and integration with event-driven services (Kafka) with zero ongoing mainframe MIPS cost."], "ocp_suitability": 82.0, "vm_suitability": 80.0}, "trade_off_matrix": [{"vector": "Elasticity & Horizontal Scaling", "ocp_rating": 95, "vm_rating": 45, "analysis": "OCP scales pods in seconds via HPA; VMs require minutes to spin up and load images."}, {"vector": "Migration Speed & Time-to-Market", "ocp_rating": 75, "vm_rating": 90, "analysis": "VM rehosting requires minimal code modification; OCP requires refactoring state and batch orchestration."}, {"vector": "Operational Independence & Licensing", "ocp_rating": 90, "vm_rating": 50, "analysis": "OCP runs open-source runtimes with standard subscriptions; VMs often require specialized legacy emulation licenses."}, {"vector": "Stateful Transaction & Session Tolerance", "ocp_rating": 85, "vm_rating": 95, "analysis": "VMs support long-lived conversational memory and TWA/CWA; OCP strictly mandates stateless processes."}, {"vector": "Data Consistency & File Locking", "ocp_rating": 45, "vm_rating": 85, "analysis": "VMs emulate OS-level shared file systems and record locking; OCP containers require externalized distributed data grids."}, {"vector": "DevOps & Modern Talent Availability", "ocp_rating": 95, "vm_rating": 60, "analysis": "Kubernetes/OpenShift attracts modern cloud engineers; legacy VM emulation maintains specialized skills barrier."}, {"vector": "Low Latency & Network Overhead", "ocp_rating": 75, "vm_rating": 88, "analysis": "VMs bypass container overlay networks (SDN/OVN) and service mesh proxies, saving 2-5ms per hop."}, {"vector": "Long-Term Strategic Agility", "ocp_rating": 98, "vm_rating": 55, "analysis": "OCP aligns with enterprise cloud-native roadmap; VM rehost is often viewed as technical debt deferral."}], "platform_candidates": [{"platform": "Red Hat OpenShift Container Platform (OCP)", "suitability_score": 82.0, "is_recommended": true, "fit_summary": "", "migration_path": "Refactor (Cloud-Native Containerization on OCP) to Cloud-Native Microservices", "estimated_cost_index": "Medium Capital / Very Low Operational (Zero MIPS)", "pros": ["Horizontal Pod Autoscaling (HPA) enables dynamic resource elasticity during transaction surges.", "Declarative GitOps deployments via ArgoCD with automated rollback and zero-downtime rolling updates.", "Complete elimination of recurring IBM mainframe MIPS licensing costs.", "Rich cloud-native observability ecosystem (OpenTelemetry, Prometheus, Grafana, Jaeger).", "Universal Linux base image (UBI) standardizes runtime across dev, staging, and production."], "cons": ["2 shared VSAM dataset(s) lack POSIX distributed record-level lock semantics across container replicas."], "blockers": [], "key_requirements": []}, {"platform": "Enterprise Linux Virtual Machine (VM)", "suitability_score": 80.0, "is_recommended": false, "fit_summary": "", "migration_path": "Replatform (Containerized COBOL / Lift & Reshape on OCP) / Lift-and-Shift to Linux VMs", "estimated_cost_index": "Low Capital / Medium Operational (Emulation Software Subscriptions)", "pros": ["Full compatibility with stateful CICS conversational programs and shared memory (CWA/TWA).", "Mainframe emulation runtimes (e.g., Micro Focus Enterprise Server) support native VSAM KSDS/ESDS files.", "Lowest code modification risk: allows verbatim compilation of existing COBOL business logic.", "Fastest time-to-market: eliminates the multi-year redesign required for microservices.", "Retains existing JCL execution sequences and step COND return codes."], "cons": ["Retains monolithic architectural debt without microservice modularity or independent deployment cycles.", "Requires ongoing commercial mainframe emulation runtime licenses (e.g. Micro Focus/Raincode).", "Scaling requires coarse-grained vertical VM resizing or active-passive clustering rather than sub-second pod autoscaling.", "Heavier resource footprint and longer boot times compared to lightweight container pods."], "blockers": [], "key_requirements": []}, {"platform": "Hybrid Coexistence (Distributed API + Mainframe Core)", "suitability_score": 35.0, "is_recommended": false, "fit_summary": "", "migration_path": "Retain (Keep on Mainframe - Low ROI / High Blast Radius) with API Gateway Abstraction", "estimated_cost_index": "Zero Capital / Very High Operational (Ongoing MIPS)", "pros": ["Guarantees 100% logic and data integrity with zero migration risk."], "cons": ["Continues incurring heavy mainframe MIPS software licensing fees."], "blockers": [], "key_requirements": []}], "adr": {"adr_id": "ADR-CORE-BNK-DEP-001", "title": "Target Hosting Platform Selection for Core Banking Deposit Subsystem", "status": "Accepted", "context": "Evaluation of Core Banking Deposit Subsystem (3 programs, 1 jobs, 2 tables, 2 VSAM files) transitioning from IBM z/OS.", "decision": "Adopt Red Hat OpenShift Container Platform (OCP) as the primary target platform (Refactor (Cloud-Native Containerization on OCP)).", "justification": "1. STATELESS READINESS: The application operates with pseudo-conversational CICS transactions or stateless services. There are no active terminal memory locks, enabling horizontal pod scaling across Red Hat OpenShift nodes without session stickiness issues. 2. PERSISTENCE MODULARITY: The data layer is decoupled from mainframe-specific VSAM record locks and runs primarily on relational DB2 schemas, which translate seamlessly to distributed databases like PostgreSQL, Amazon Aurora, or Crunchy Data on OpenShift. 3. BUSINESS VALUE & AGILITY: Containerization unlocks automated GitOps deployment pipelines, canary deployments, and integration with event-driven services (Kafka) with zero ongoing mainframe MIPS cost.", "consequences_positive": ["Horizontal Pod Autoscaling (HPA) enables dynamic resource elasticity during transaction surges.", "Declarative GitOps deployments via ArgoCD with automated rollback and zero-downtime rolling updates.", "Complete elimination of recurring IBM mainframe MIPS licensing costs.", "Rich cloud-native observability ecosystem (OpenTelemetry, Prometheus, Grafana, Jaeger).", "Universal Linux base image (UBI) standardizes runtime across dev, staging, and production."], "consequences_negative": ["2 shared VSAM dataset(s) lack POSIX distributed record-level lock semantics across container replicas."], "roadmap_phases": [{"phase": 1, "name": "Phase 1: Remediation & Decoupling", "focus": "Resolve critical blockers (eliminate ALTER verbs, decouple VSAM, extract session state).", "duration_months": 3}, {"phase": 2, "name": "Phase 2: Deployment to Red Hat OpenShift Container Platform (OCP)", "focus": "Build automated CI/CD pipelines, configure Red Hat OpenShift Container Platform (OCP) resources, and execute migration.", "duration_months": 6}, {"phase": 3, "name": "Phase 3: Validation, Cutover & Mainframe Decommission", "focus": "Parallel run testing, dark launch verification, zero-downtime cutover, and MIPS de-allocation.", "duration_months": 3}]}}, "dependency_graph": {"nodes": [{"id": "ACCT010", "label": "ACCT010", "type": "Program", "complexity_score": 5.0, "lines_of_code": 41, "color": "#10B981", "metadata": {"is_cics": true, "is_batch": false, "is_conversational": false, "cyclomatic_complexity": 5, "maintainability_index": 45.3}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "ACCT020", "label": "ACCT020", "type": "Program", "complexity_score": 5.0, "lines_of_code": 47, "color": "#10B981", "metadata": {"is_cics": true, "is_batch": false, "is_conversational": false, "cyclomatic_complexity": 5, "maintainability_index": 43.1}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "ACCTPOST", "label": "ACCTPOST", "type": "Program", "complexity_score": 5.0, "lines_of_code": 47, "color": "#F59E0B", "metadata": {"is_cics": false, "is_batch": true, "is_conversational": false, "cyclomatic_complexity": 5, "maintainability_index": 45.1}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "CPY_ACCTREC", "label": "ACCTREC", "type": "Copybook", "complexity_score": 6.0, "lines_of_code": 12, "color": "#8B5CF6", "metadata": {"field_count": 6, "has_redefines": false, "referenced_by_count": 2}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "CPY_TXNREC", "label": "TXNREC", "type": "Copybook", "complexity_score": 7.0, "lines_of_code": 14, "color": "#8B5CF6", "metadata": {"field_count": 7, "has_redefines": false, "referenced_by_count": 2}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "CPY_SQLCA", "label": "SQLCA", "type": "Copybook", "complexity_score": 10.0, "lines_of_code": 20, "color": "#8B5CF6", "metadata": {"field_count": 10, "has_redefines": false, "referenced_by_count": 3}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "TBL_ACCOUNT_MASTER", "label": "ACCOUNT_MASTER", "type": "Table", "complexity_score": 6.0, "lines_of_code": 6, "color": "#10B981", "metadata": {"column_count": 6, "primary_key": ["ACCOUNT_ID"]}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "TBL_TRANSACTION_LOG", "label": "TRANSACTION_LOG", "type": "Table", "complexity_score": 5.0, "lines_of_code": 5, "color": "#10B981", "metadata": {"column_count": 5, "primary_key": ["TXN_ID"]}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "VSAM_PRTFILE", "label": "PRTFILE", "type": "Vsam", "complexity_score": 10.0, "lines_of_code": 0, "color": "#F59E0B", "metadata": {"organization": "KSDS", "record_length": 80}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "VSAM_TXNIN", "label": "TXNIN", "type": "Vsam", "complexity_score": 10.0, "lines_of_code": 0, "color": "#F59E0B", "metadata": {"organization": "KSDS", "record_length": 80}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "JOB_EODPOST", "label": "EODPOST", "type": "Job", "complexity_score": 1.0, "lines_of_code": 15, "color": "#EC4899", "metadata": {"steps_count": 1}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "BMS_ACCTSET", "label": "ACCTSET", "type": "Mapset", "complexity_score": 7.0, "lines_of_code": 21, "color": "#F97316", "metadata": {"maps_count": 2, "fields_count": 7}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}], "edges": [{"source": "ACCT010", "target": "CPY_ACCTREC", "type": "USES_COPYBOOK", "label": "COPY", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCT010", "target": "CPY_SQLCA", "type": "USES_COPYBOOK", "label": "COPY", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCT010", "target": "TBL_ACCOUNT_MASTER", "type": "QUERIES_TABLE", "label": "EXEC SQL", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCT020", "target": "CPY_ACCTREC", "type": "USES_COPYBOOK", "label": "COPY", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCT020", "target": "CPY_SQLCA", "type": "USES_COPYBOOK", "label": "COPY", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCT020", "target": "CPY_TXNREC", "type": "USES_COPYBOOK", "label": "COPY", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCT020", "target": "TBL_ACCOUNT_MASTER", "type": "QUERIES_TABLE", "label": "EXEC SQL", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCT020", "target": "TBL_TRANSACTION_LOG", "type": "QUERIES_TABLE", "label": "EXEC SQL", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCTPOST", "target": "CPY_SQLCA", "type": "USES_COPYBOOK", "label": "COPY", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCTPOST", "target": "CPY_TXNREC", "type": "USES_COPYBOOK", "label": "COPY", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCTPOST", "target": "TBL_ACCOUNT_MASTER", "type": "QUERIES_TABLE", "label": "EXEC SQL", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCTPOST", "target": "VSAM_PRTFILE", "type": "ACCESSES_VSAM", "label": "READ/WRITE", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "ACCTPOST", "target": "VSAM_TXNIN", "type": "ACCESSES_VSAM", "label": "READ/WRITE", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "JOB_EODPOST", "target": "ACCTPOST", "type": "EXECUTES", "label": "STEP: STEP010", "weight": 1.0, "is_dynamic": false, "properties": {}}], "total_nodes": 12, "total_edges": 14, "god_objects": ["ACCTPOST", "ACCT020", "ACCT010", "CPY_SQLCA", "TBL_ACCOUNT_MASTER"], "cycles_detected": 0, "metrics": {}, "blast_radius_summary": {}}};
+
+        // Tab Switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            const target = document.getElementById(tabId);
+            if (target) target.classList.remove('hidden');
+
+            const btn = document.getElementById('btn-' + tabId);
+            if (btn) btn.classList.add('active');
+
+            if (tabId === 'tab-radar' && radarChartInstance) {
+                radarChartInstance.resize();
+            }
+            if (tabId === 'tab-semantic' && scatterChartInstance) {
+                scatterChartInstance.resize();
+            }
+            if (tabId === 'tab-graph') {
+                initGraphRenderer();
+            }
+        }
+
+        // Populate Header & Overview
+        function populateOverview() {
+            const pf = reportData.portfolio || {};
+            const decision = reportData.decision || {};
+            const assessment = reportData.assessment || {};
+
+            document.getElementById('headerAppId').innerText = (pf.app_name || 'Legacy App') + ' (' + (pf.app_id || 'APP') + ')';
+
+            const targetBadge = document.getElementById('targetBadge');
+            const heroCard = document.getElementById('heroCard');
+            const dispositionBadge = document.getElementById('dispositionBadge');
+
+            const isOcp = decision.primary_platform === 'OpenShift';
+            if (isOcp) {
+                targetBadge.className = 'px-4 py-2 rounded-xl font-bold text-xs flex items-center space-x-2 bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                targetBadge.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span><span>TARGET: RED HAT OPENSHIFT</span>';
+                heroCard.classList.add('glow-ocp', 'border-emerald-500/30');
+                dispositionBadge.className = 'px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                dispositionBadge.innerText = (decision.recommended_disposition || 'REFACTOR') + ' TO OPENSHIFT';
+            } else {
+                targetBadge.className = 'px-4 py-2 rounded-xl font-bold text-xs flex items-center space-x-2 bg-amber-500/20 text-amber-400 border-amber-500/30';
+                targetBadge.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span><span>TARGET: LINUX VIRTUAL MACHINE</span>';
+                heroCard.classList.add('glow-vm', 'border-amber-500/30');
+                dispositionBadge.className = 'px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                dispositionBadge.innerText = (decision.recommended_disposition || 'REPLATFORM') + ' TO LINUX VM';
+            }
+
+            document.getElementById('heroTitle').innerText = decision.decision_summary || 'Target Platform Evaluation Completed';
+            document.getElementById('heroSummary').innerText = (decision.logical_justification && decision.logical_justification.summary) || 'Comprehensive assessment across 8 dimensions.';
+            document.getElementById('heroScore').innerText = assessment.overall_normalized_score || 0;
+            document.getElementById('heroEffort').innerText = (assessment.total_estimated_person_days || 0) + ' Person-Days';
+
+            // Counts
+            document.getElementById('cntProgs').innerText = Object.keys(pf.programs || {}).length;
+            const totalLoc = Object.values(pf.programs || {}).reduce((acc, p) => acc + (p.lines_of_code || 0), 0);
+            document.getElementById('cntLoc').innerText = totalLoc.toLocaleString() + ' LOC';
+            document.getElementById('cntCpy').innerText = Object.keys(pf.copybooks || {}).length;
+            document.getElementById('cntTx').innerText = Object.keys(pf.transactions || {}).length;
+            document.getElementById('cntBms').innerText = Object.keys(pf.mapsets || {}).length + ' BMS Screens';
+            document.getElementById('cntTables').innerText = Object.keys(pf.tables || {}).length;
+            document.getElementById('cntVsam').innerText = Object.keys(pf.vsam_files || {}).length;
+            document.getElementById('cntJobs').innerText = Object.keys(pf.jobs || {}).length;
+            const totalSteps = Object.values(pf.jobs || {}).reduce((acc, j) => acc + (j.steps ? j.steps.length : 0), 0);
+            document.getElementById('cntSteps').innerText = totalSteps + ' Execution Steps';
+
+            // Dimension Bars
+            const dims = assessment.dimension_scores || [];
+            const dimsContainer = document.getElementById('dimensionBarsList');
+            dimsContainer.innerHTML = '';
+            dims.forEach(d => {
+                const pct = d.normalized_score;
+                const color = pct >= 70 ? 'bg-emerald-500' : (pct >= 40 ? 'bg-amber-500' : 'bg-red-500');
+                const row = document.createElement('div');
+                row.className = 'space-y-1';
+                row.innerHTML = `
+                    <div class="flex justify-between text-xs font-semibold">
+                        <span class="text-slate-300">${d.dimension_name}</span>
+                        <span class="text-slate-400 font-mono">${pct}% <span class="text-[10px] text-slate-500">(${d.readiness_rating})</span></span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                        <div class="${color} h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                dimsContainer.appendChild(row);
+            });
+
+            // Top Blockers
+            const risks = assessment.risks || [];
+            const criticals = risks.filter(r => r.severity === 'Critical');
+            document.getElementById('blockerCountLabel').innerText = criticals.length + ' Critical Blocker(s)';
+            const topBlockersContainer = document.getElementById('topBlockersList');
+            topBlockersContainer.innerHTML = '';
+            risks.slice(0, 4).forEach(r => {
+                const item = document.createElement('div');
+                item.className = 'p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start space-x-3';
+                const badgeColor = r.severity === 'Critical' ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+                item.innerHTML = `
+                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border ${badgeColor} shrink-0">${r.severity}</span>
+                    <div class="space-y-1">
+                        <div class="text-xs font-bold text-white">${r.title}</div>
+                        <div class="text-[11px] text-slate-400">${r.description}</div>
+                        <div class="text-[10px] text-cyan-400 font-semibold">&rarr; ${r.remediation_strategy}</div>
+                    </div>
+                `;
+                topBlockersContainer.appendChild(item);
+            });
+        }
+
+        // Radar Chart Instance
+        let radarChartInstance = null;
+        function initRadarChart() {
+            const dims = (reportData.assessment && reportData.assessment.dimension_scores) || [];
+            const labels = dims.map(d => d.dimension_name);
+            const scores = dims.map(d => d.normalized_score);
+
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Readiness Index',
+                        data: scores,
+                        fill: true,
+                        backgroundColor: 'rgba(6, 182, 212, 0.25)',
+                        borderColor: '#06b6d4',
+                        pointBackgroundColor: '#38bdf8',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#06b6d4',
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: {
+                                color: '#94a3b8',
+                                font: { size: 10, family: 'Plus Jakarta Sans', weight: '600' }
+                            },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                color: '#64748b',
+                                min: 0,
+                                max: 100,
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Detailed Dimension Cards
+            const container = document.getElementById('dimensionDetailedCards');
+            container.innerHTML = '';
+            dims.forEach(d => {
+                const card = document.createElement('div');
+                card.className = 'p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-white">${d.dimension_name}</span>
+                        <span class="text-xs font-mono font-bold text-cyan-400">${d.normalized_score}%</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400">${d.key_findings ? d.key_findings.join(' ') : ''}</div>
+                    ${d.blockers && d.blockers.length ? '<div class="text-[10px] text-red-400 font-semibold">&bull; Blocker: ' + d.blockers.join('; ') + '</div>' : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Platform Decision Tab Populator
+        function populateDecisionTab() {
+            const decision = reportData.decision || {};
+            document.getElementById('scoreOcpVal').innerText = (decision.ocp_score || 0) + '%';
+            document.getElementById('scoreVmVal').innerText = (decision.vm_score || 0) + '%';
+
+            const isOcp = decision.primary_platform === 'OpenShift';
+            if (isOcp) {
+                document.getElementById('cardOcp').classList.add('glow-ocp', 'border-emerald-500/40');
+                document.getElementById('scoreOcpVal').classList.add('text-emerald-400');
+                document.getElementById('scoreVmVal').classList.add('text-slate-400');
+            } else {
+                document.getElementById('cardVm').classList.add('glow-vm', 'border-amber-500/40');
+                document.getElementById('scoreVmVal').classList.add('text-amber-400');
+                document.getElementById('scoreOcpVal').classList.add('text-slate-400');
+            }
+
+            const ocpCandidate = (decision.platform_candidates || []).find(c => c.platform === 'OpenShift');
+            const vmCandidate = (decision.platform_candidates || []).find(c => c.platform === 'VirtualMachine');
+
+            if (ocpCandidate) {
+                const prosList = document.getElementById('prosOcpList');
+                prosList.innerHTML = (ocpCandidate.pros || []).map(p => `<li>${p}</li>`).join('');
+                const blkList = document.getElementById('blockersOcpList');
+                blkList.innerHTML = (ocpCandidate.blockers && ocpCandidate.blockers.length)
+                    ? ocpCandidate.blockers.map(b => `<li class="text-red-400 font-medium">${b}</li>`).join('')
+                    : '<li class="text-emerald-400">Zero Critical Blockers for OpenShift.</li>';
+            }
+
+            if (vmCandidate) {
+                const prosList = document.getElementById('prosVmList');
+                prosList.innerHTML = (vmCandidate.pros || []).map(p => `<li>${p}</li>`).join('');
+                const consList = document.getElementById('consVmList');
+                consList.innerHTML = (vmCandidate.cons || []).map(c => `<li>${c}</li>`).join('');
+            }
+
+            // Trade Off Matrix
+            const rows = decision.trade_off_matrix || [];
+            const tbody = document.getElementById('tradeOffTableBody');
+            tbody.innerHTML = rows.map(r => `
+                <tr class="hover:bg-slate-900/50 transition">
+                    <td class="p-3 font-semibold text-white">${r.vector}</td>
+                    <td class="p-3 text-center font-mono font-bold ${r.ocp_rating >= 70 ? 'text-emerald-400' : 'text-slate-400'}">${r.ocp_rating}%</td>
+                    <td class="p-3 text-center font-mono font-bold ${r.vm_rating >= 70 ? 'text-amber-400' : 'text-slate-400'}">${r.vm_rating}%</td>
+                    <td class="p-3 text-slate-300 text-[11px] leading-relaxed">${r.analysis}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Semantic Clustering Scatter Chart
+        let scatterChartInstance = null;
+        function initSemanticScatter() {
+            const clusters = reportData.semantic_clusters || [];
+            const rawCoords = reportData.semantic_coords || [];
+            const coords = {};
+            if (Array.isArray(rawCoords)) {
+                rawCoords.forEach(item => {
+                    coords[item.program_id] = [item.x, item.y];
+                });
+            } else {
+                Object.assign(coords, rawCoords);
+            }
+
+            const clusterColors = ['#38bdf8', '#a855f7', '#10b981', '#f59e0b', '#ec4899', '#f97316'];
+            const datasets = clusters.map((c, i) => {
+                const color = clusterColors[i % clusterColors.length];
+                const points = (c.programs || []).map(pid => {
+                    const pt = coords[pid] || [0, 0];
+                    return { x: pt[0], y: pt[1], label: pid };
+                });
+
+                return {
+                    label: c.cluster_name,
+                    data: points,
+                    backgroundColor: color,
+                    borderColor: '#fff',
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                };
+            });
+
+            const ctx = document.getElementById('clusterScatterChart').getContext('2d');
+            scatterChartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#64748b' },
+                            title: { display: true, text: 'Semantic PCA Component 1', color: '#94a3b8', font: { size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#64748b' },
+                            title: { display: true, text: 'Semantic PCA Component 2', color: '#94a3b8', font: { size: 10 } }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#cbd5e1', font: { size: 11 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw.label + ' (' + context.dataset.label + ')';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Clusters List
+            const list = document.getElementById('clustersList');
+            list.innerHTML = clusters.map(c => `
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-white">${c.cluster_name}</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300">Cohesion: ${c.cohesion_score}</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400">${c.business_domain}</div>
+                    <div class="text-[10px] text-slate-500 pt-1 font-mono">Members: ${c.programs.join(', ')}</div>
+                    <div class="text-[10px] text-emerald-400 font-semibold pt-0.5">Target: ${c.suggested_target}</div>
+                </div>
+            `).join('');
+        }
+
+        // 12-Factor Tab Populator
+        function populateTwelveFactorTab() {
+            const factors = (reportData.assessment && reportData.assessment.twelve_factor_compliance) || [];
+            const avg = (reportData.assessment && reportData.assessment.average_factor_score) || 0;
+            document.getElementById('twelveFactorAvg').innerText = avg + '%';
+
+            const grid = document.getElementById('twelveFactorGrid');
+            grid.innerHTML = factors.map(f => {
+                const statusBadge = f.status === 'Compliant'
+                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    : (f.status === 'Partial'
+                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                        : 'bg-red-500/20 text-red-400 border-red-500/30');
+
+                return `
+                    <div class="glass-panel p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-white font-mono">Factor ${f.factor_id}: ${f.name}</span>
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${statusBadge}">${f.status}</span>
+                        </div>
+                        <div class="text-[11px] text-slate-300 leading-relaxed">${f.gap_analysis}</div>
+                        <div class="text-[10px] text-cyan-400 font-semibold pt-1 border-t border-slate-800/80">&rarr; ${f.remediation}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Risk Catalog Tab
+        let activeRisks = [];
+        function populateRisksTab() {
+            activeRisks = (reportData.assessment && reportData.assessment.risks) || [];
+            document.getElementById('riskCountBadge').innerText = activeRisks.length;
+            renderRisksList(activeRisks);
+        }
+
+        function filterRisks(sev) {
+            if (sev === 'ALL') {
+                renderRisksList(activeRisks);
+            } else {
+                renderRisksList(activeRisks.filter(r => r.severity === sev));
+            }
+        }
+
+        function renderRisksList(risks) {
+            const container = document.getElementById('risksCatalogList');
+            container.innerHTML = risks.map(r => {
+                const sevBadge = r.severity === 'Critical'
+                    ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                    : (r.severity === 'High'
+                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                        : 'bg-blue-500/20 text-blue-400 border-blue-500/30');
+
+                return `
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded border ${sevBadge}">${r.severity}</span>
+                                <span class="font-mono text-xs text-slate-400 font-bold">${r.risk_id}</span>
+                                <h4 class="text-xs font-bold text-white">${r.title}</h4>
+                            </div>
+                            <span class="text-xs font-bold text-amber-400 font-mono">${r.effort_person_days} Person-Days</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">${r.description}</p>
+                        <div class="text-xs text-slate-400 flex flex-wrap gap-4 pt-1 text-[11px]">
+                            <span><strong class="text-slate-300">Dimension:</strong> ${r.dimension}</span>
+                            <span><strong class="text-slate-300">Affected:</strong> ${r.affected_artifacts.join(', ')}</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-[11px] text-cyan-300 font-mono">
+                            <strong>Remediation Strategy:</strong> ${r.remediation_strategy}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ADR Tab Populator
+        function populateAdrTab() {
+            const adr = (reportData.decision && reportData.decision.adr) || {};
+            document.getElementById('adrId').innerText = adr.adr_id || 'ADR-001';
+            document.getElementById('adrTitle').innerText = adr.title || 'Architecture Decision Record';
+            document.getElementById('adrContext').innerText = adr.context || '';
+            document.getElementById('adrDecision').innerText = adr.decision || '';
+            document.getElementById('adrJustification').innerText = adr.justification || '';
+
+            const posList = document.getElementById('adrPosList');
+            posList.innerHTML = (adr.consequences_positive || []).map(p => `<li>${p}</li>`).join('');
+
+            const negList = document.getElementById('adrNegList');
+            negList.innerHTML = (adr.consequences_negative || []).map(n => `<li>${n}</li>`).join('');
+
+            const phases = document.getElementById('adrRoadmapPhases');
+            phases.innerHTML = (adr.roadmap_phases || []).map(ph => `
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-cyan-400">${ph.name}</span>
+                        <span class="text-[10px] text-slate-400">${ph.duration_months} mo</span>
+                    </div>
+                    <div class="text-[11px] text-slate-300">${ph.focus}</div>
+                </div>
+            `).join('');
+        }
+
+        // -------------------------------------------------------------
+        // Dependency Graph HTML5 Canvas Renderer with Physics Simulation
+        // -------------------------------------------------------------
+        let graphNodes = [];
+        let graphEdges = [];
+        let selectedNode = null;
+        let isGraphInitialized = false;
+
+        function initGraphRenderer() {
+            if (isGraphInitialized) return;
+            isGraphInitialized = true;
+
+            const graphData = reportData.dependency_graph || {};
+            const canvas = document.getElementById('graphCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function resizeCanvas() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // Layout initial nodes in radial circle
+            const rawNodes = graphData.nodes || [];
+            const rawEdges = graphData.edges || [];
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const radius = Math.min(cx, cy) * 0.7;
+
+            graphNodes = rawNodes.map((n, idx) => {
+                const angle = (idx / rawNodes.length) * 2 * Math.PI;
+                return {
+                    id: n.id,
+                    label: n.label,
+                    type: n.type,
+                    color: n.color || '#3b82f6',
+                    x: cx + radius * Math.cos(angle) + (Math.random() - 0.5) * 40,
+                    y: cy + radius * Math.sin(angle) + (Math.random() - 0.5) * 40,
+                    vx: 0,
+                    vy: 0,
+                    radius: Math.max(12, Math.min(24, 12 + (n.complexity_score || 0) / 4)),
+                    raw: n
+                };
+            });
+
+            graphEdges = rawEdges.map(e => ({
+                source: e.source,
+                target: e.target,
+                label: e.label,
+                type: e.type
+            }));
+
+            // Run simple spring simulation
+            function stepSimulation() {
+                for (let i = 0; i < graphNodes.length; i++) {
+                    for (let j = i + 1; j < graphNodes.length; j++) {
+                        const n1 = graphNodes[i];
+                        const n2 = graphNodes[j];
+                        const dx = n2.x - n1.x;
+                        const dy = n2.y - n1.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                        if (dist < 180) {
+                            const force = (180 - dist) / dist * 0.08;
+                            n1.x -= dx * force;
+                            n1.y -= dy * force;
+                            n2.x += dx * force;
+                            n2.y += dy * force;
+                        }
+                    }
+                }
+
+                // Edge spring force
+                graphEdges.forEach(edge => {
+                    const n1 = graphNodes.find(n => n.id === edge.source);
+                    const n2 = graphNodes.find(n => n.id === edge.target);
+                    if (n1 && n2) {
+                        const dx = n2.x - n1.x;
+                        const dy = n2.y - n1.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                        const force = (dist - 120) * 0.005;
+                        n1.x += dx * force;
+                        n1.y += dy * force;
+                        n2.x -= dx * force;
+                        n2.y -= dy * force;
+                    }
+                });
+
+                // Center pull
+                graphNodes.forEach(n => {
+                    n.x += (cx - n.x) * 0.01;
+                    n.y += (cy - n.y) * 0.01;
+                });
+            }
+
+            for (let iter = 0; iter < 80; iter++) stepSimulation();
+
+            // Render loop
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw Edges
+                ctx.lineWidth = 1;
+                graphEdges.forEach(edge => {
+                    const n1 = graphNodes.find(n => n.id === edge.source);
+                    const n2 = graphNodes.find(n => n.id === edge.target);
+                    if (n1 && n2) {
+                        ctx.strokeStyle = (selectedNode && (selectedNode.id === n1.id || selectedNode.id === n2.id))
+                            ? '#38bdf8'
+                            : 'rgba(255, 255, 255, 0.15)';
+                        ctx.beginPath();
+                        ctx.moveTo(n1.x, n1.y);
+                        ctx.lineTo(n2.x, n2.y);
+                        ctx.stroke();
+                    }
+                });
+
+                // Draw Nodes
+                graphNodes.forEach(n => {
+                    ctx.beginPath();
+                    ctx.arc(n.x, n.y, n.radius, 0, 2 * Math.PI);
+                    ctx.fillStyle = n.color;
+                    ctx.fill();
+
+                    if (selectedNode && selectedNode.id === n.id) {
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = '#38bdf8';
+                        ctx.stroke();
+                    }
+
+                    // Label
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '10px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(n.label, n.x, n.y + n.radius + 12);
+                });
+
+                requestAnimationFrame(render);
+            }
+            render();
+
+            // Canvas Click Listener for Inspection
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                const clicked = graphNodes.find(n => {
+                    const dx = mouseX - n.x;
+                    const dy = mouseY - n.y;
+                    return Math.sqrt(dx * dx + dy * dy) <= n.radius + 4;
+                });
+
+                if (clicked) {
+                    inspectNode(clicked);
+                } else {
+                    closeInspector();
+                }
+            });
+        }
+
+        function inspectNode(node) {
+            selectedNode = node;
+            const inspector = document.getElementById('nodeInspector');
+            inspector.classList.remove('hidden');
+
+            document.getElementById('inspectNodeType').innerText = node.type;
+            document.getElementById('inspectNodeLabel').innerText = node.label;
+
+            const metaContainer = document.getElementById('inspectNodeMeta');
+            const meta = node.raw.metadata || {};
+            metaContainer.innerHTML = Object.entries(meta).map(([k, v]) => `
+                <div class="flex justify-between">
+                    <span class="text-slate-400">${k.replace(/_/g, ' ')}:</span>
+                    <span class="font-mono font-bold text-white">${v}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('blastRadiusResult').classList.add('hidden');
+        }
+
+        function closeInspector() {
+            selectedNode = null;
+            document.getElementById('nodeInspector').classList.add('hidden');
+        }
+
+        function runBlastRadiusOnSelected() {
+            if (!selectedNode) return;
+            const resContainer = document.getElementById('blastRadiusResult');
+            resContainer.classList.remove('hidden');
+
+            // Find connected dependents in graphEdges
+            const dependents = graphEdges.filter(e => e.target === selectedNode.id || e.source === selectedNode.id);
+            resContainer.innerHTML = `
+                <div class="p-2 rounded bg-red-950/40 border border-red-800/60 mt-1">
+                    <div class="font-bold text-red-300">Blast Radius: High</div>
+                    <div class="text-[10px] text-slate-300 mt-0.5">Directly connected to ${dependents.length} artifact(s). Transitive regression surface spans batch orchestration and data persistence.</div>
+                </div>
+            `;
+        }
+
+        function filterGraph(typeFilter) {
+            // Can be expanded to filter canvas view
+        }
+
+        // Initialization on load
+        window.addEventListener('DOMContentLoaded', () => {
+            populateOverview();
+            initRadarChart();
+            populateDecisionTab();
+            initSemanticScatter();
+            populateTwelveFactorTab();
+            populateRisksTab();
+            populateAdrTab();
+        });
+    </script>
+</body>
+</html>

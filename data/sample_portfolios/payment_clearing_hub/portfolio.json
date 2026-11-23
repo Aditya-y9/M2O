@@ -1,0 +1,24 @@
+{
+  "app_id": "PAY-CLEAR-HUB",
+  "app_name": "Real-Time Payment Clearing & Settlement Hub",
+  "business_domain": "Payments & Clearing",
+  "source_platform": "IBM z/OS v2.5 Parallel Sysplex",
+  "target_platforms": ["OpenShift", "Linux VM", "Retain Mainframe"],
+  "nfr": {
+    "target_tps": 3200.0,
+    "max_latency_p99_ms": 15.0,
+    "availability_sla": "99.999%",
+    "rto_minutes": 5,
+    "rpo_minutes": 0,
+    "regulatory_compliance": ["FedNow", "CHIPS", "SWIFT ISO20022"],
+    "daily_batch_window_hours": 1.0
+  },
+  "racf_profiles": [
+    {
+      "profile_name": "PAY.SAF.EXIT.*",
+      "resource_class": "FACILITY",
+      "access_level": "ALTER",
+      "authorized_groups": ["SECOPS"]
+    }
+  ]
+}

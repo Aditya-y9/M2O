@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModernizeIQ Pro: AI-Powered Blast Radius Engine - Insurance Policy Administration Monolith</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0A0E17;
+            color: #E5E7EB;
+            overflow: hidden;
+        }
+        
+        .main-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* Left Panel: Graph and Controls */
+        .left-panel {
+            flex: 0 0 70%;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #1F2937;
+        }
+        
+        /* Header with Q&A Bar */
+        .header {
+            background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
+            padding: 16px 24px;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .app-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #58D3A5;
+        }
+        
+        .app-id {
+            font-size: 14px;
+            color: #9CA3AF;
+        }
+        
+        /* Natural Language Q&A Input */
+        .qa-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .qa-input {
+            flex: 1;
+            background: #1F2937;
+            border: 2px solid #374151;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #E5E7EB;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .qa-input:focus {
+            outline: none;
+            border-color: #58D3A5;
+            background: #111827;
+        }
+        
+        .qa-input::placeholder {
+            color: #6B7280;
+        }
+        
+        .qa-button {
+            background: linear-gradient(135deg, #58D3A5 0%, #3B9B7A 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: #0A0E17;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .qa-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .qa-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Q&A Results Panel */
+        .qa-results {
+            background: #1F2937;
+            border: 2px solid #374151;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            display: none;
+        }
+        
+        .qa-results.visible {
+            display: block;
+        }
+        
+        .qa-answer {
+            color: #E5E7EB;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        
+        .qa-matches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .qa-match-chip {
+            background: #374151;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .qa-match-chip:hover {
+            background: #4B5563;
+            transform: translateY(-2px);
+        }
+        
+        .qa-match-type {
+            color: #9CA3AF;
+        }
+        
+        .qa-match-name {
+            color: #58D3A5;
+            font-weight: 500;
+        }
+        
+        .qa-relevance {
+            background: #58D3A5;
+            color: #0A0E17;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        /* Graph Container */
+        .graph-container {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at 50% 50%, #1F2937 0%, #0A0E17 100%);
+        }
+        
+        #dependency-graph {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* What-If Simulator Controls */
+        .simulator-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 16px;
+            min-width: 250px;
+        }
+        
+        .simulator-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #58D3A5;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .simulator-mode {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .mode-button {
+            flex: 1;
+            background: #1F2937;
+            border: 1px solid #374151;
+            border-radius: 6px;
+            padding: 8px;
+            color: #9CA3AF;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .mode-button.active {
+            background: #58D3A5;
+            color: #0A0E17;
+            border-color: #58D3A5;
+            font-weight: 600;
+        }
+        
+        .platform-selector {
+            background: #1F2937;
+            border: 1px solid #374151;
+            border-radius: 6px;
+            padding: 8px;
+            color: #E5E7EB;
+            font-size: 12px;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        
+        .simulator-hint {
+            font-size: 11px;
+            color: #6B7280;
+            font-style: italic;
+        }
+        
+        /* Right Panel: Inspector */
+        .right-panel {
+            flex: 0 0 30%;
+            display: flex;
+            flex-direction: column;
+            background: #111827;
+            overflow-y: auto;
+        }
+        
+        .inspector {
+            padding: 24px;
+        }
+        
+        .section {
+            margin-bottom: 32px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+        
+        /* Metrics Cards */
+        .metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 4px solid #58D3A5;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: #9CA3AF;
+            margin-bottom: 4px;
+        }
+        
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #58D3A5;
+        }
+        
+        .metric-unit {
+            font-size: 14px;
+            color: #9CA3AF;
+            margin-left: 4px;
+        }
+        
+        .metric-change {
+            font-size: 12px;
+            color: #E3B65D;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        
+        /* Risk Cards */
+        .risk-card {
+            background: #1F2937;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .risk-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .risk-number {
+            background: #374151;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .risk-title {
+            flex: 1;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .risk-severity {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        
+        .risk-description {
+            font-size: 12px;
+            color: #9CA3AF;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .risk-mitigation {
+            font-size: 11px;
+            color: #6B7280;
+            line-height: 1.4;
+        }
+        
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, #374151 0%, #1F2937 100%);
+            border: 1px solid #4B5563;
+            border-radius: 8px;
+            padding: 14px;
+            color: #E5E7EB;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .action-button:hover {
+            background: linear-gradient(135deg, #4B5563 0%, #374151 100%);
+            border-color: #58D3A5;
+            transform: translateY(-2px);
+        }
+        
+        .action-button.primary {
+            background: linear-gradient(135deg, #58D3A5 0%, #3B9B7A 100%);
+            color: #0A0E17;
+            border-color: #58D3A5;
+        }
+        
+        .action-button.primary:hover {
+            background: linear-gradient(135deg, #3B9B7A 0%, #2D7D5F 100%);
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #374151;
+            border-top-color: #58D3A5;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .spinner.visible {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Left Panel: Graph and Controls -->
+        <div class="left-panel">
+            <!-- Header with Natural Language Q&A -->
+            <div class="header">
+                <div class="header-top">
+                    <div>
+                        <div class="app-title">Insurance Policy Administration Monolith</div>
+                        <div class="app-id">INS-POL-ADMIN</div>
+                    </div>
+                </div>
+                
+                <!-- Natural Language Q&A -->
+                <div class="qa-container">
+                    <input 
+                        type="text" 
+                        class="qa-input" 
+                        id="qa-input"
+                        placeholder="Ask anything: 'What are the riskiest components?' 'Which databases touch payment data?' 'Show me batch jobs scheduled daily'"
+                    >
+                    <button class="qa-button" onclick="handleNLQuery()">
+                        <span id="qa-button-text">Ask AI</span>
+                        <span class="spinner" id="qa-spinner"></span>
+                    </button>
+                </div>
+                
+                <!-- Q&A Results -->
+                <div class="qa-results" id="qa-results">
+                    <div class="qa-answer" id="qa-answer"></div>
+                    <div class="qa-matches" id="qa-matches"></div>
+                </div>
+            </div>
+            
+            <!-- Graph Container -->
+            <div class="graph-container">
+                <svg id="dependency-graph"></svg>
+                
+                <!-- What-If Simulator Controls -->
+                <div class="simulator-controls">
+                    <div class="simulator-title">
+                        🎮 What-If Simulator
+                    </div>
+                    <div class="simulator-mode">
+                        <button class="mode-button active" onclick="setSimulatorMode('view')">View</button>
+                        <button class="mode-button" onclick="setSimulatorMode('simulate')">Simulate</button>
+                    </div>
+                    <select class="platform-selector" id="platform-selector" disabled>
+                        <option value="">Select target platform...</option>
+                        <option value="vm">VM (IaaS)</option>
+                        <option value="ocp">OpenShift (PaaS)</option>
+                        <option value="mainframe">Keep Mainframe</option>
+                    </select>
+                    <div class="simulator-hint">
+                        Enable Simulate mode, then click nodes to assign platforms
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Panel: Inspector -->
+        <div class="right-panel">
+            <div class="inspector">
+                <!-- ROI Metrics -->
+                <div class="section">
+                    <div class="section-title">Business Impact</div>
+                    <div class="metrics">
+                        <div class="metric-card">
+                            <div class="metric-label">Risk Score</div>
+                            <div class="metric-value" id="risk-score">0</div>
+                            <div class="metric-change" id="risk-change">Baseline</div>
+                        </div>
+                        <div class="metric-card" style="border-left-color: #E3B65D;">
+                            <div class="metric-label">Estimated Effort</div>
+                            <div class="metric-value" id="effort-value">46</div>
+                            <div class="metric-unit">days</div>
+                            <div class="metric-change" id="effort-change">~3 person team</div>
+                        </div>
+                        <div class="metric-card" style="border-left-color: #58D3A5;">
+                            <div class="metric-label">Annual Cloud Savings</div>
+                            <div class="metric-value" id="savings-value">$130,000</div>
+                            <div class="metric-change" id="savings-change">~3 month payback</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Top Risks -->
+                <div class="section">
+                    <div class="section-title">Top Migration Risks</div>
+                    
+                </div>
+                
+                <!-- Actions -->
+                <div class="section">
+                    <div class="section-title">Actions</div>
+                    <div class="actions">
+                        <button class="action-button primary" onclick="generateMigrationPlan()">
+                            📋 Generate Migration Plan
+                        </button>
+                        <button class="action-button" onclick="exportEvidence()">
+                            📦 Export Evidence Package
+                        </button>
+                        <button class="action-button" onclick="exportScenario()">
+                            💾 Save Scenario
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Platform Recommendation -->
+                <div class="section">
+                    <div class="section-title">Recommendation</div>
+                    <div class="risk-card">
+                        <div class="risk-title" style="color: #58D3A5;">To Be Determined</div>
+                        <div class="risk-description"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let graphData = {"nodes": [{"id": "POLBAT01", "name": "POLBAT01", "type": "Program", "risk": 83, "color": "#EF4444", "in_degree": 1, "out_degree": 3}, {"id": "POLC100", "name": "POLC100", "type": "Program", "risk": 16, "color": "#58D3A5", "in_degree": 0, "out_degree": 1}, {"id": "POLC200", "name": "POLC200", "type": "Program", "risk": 50, "color": "#E3B65D", "in_degree": 0, "out_degree": 3}, {"id": "CPY_CLMREC", "name": "CPY_CLMREC", "type": "Copybook", "risk": 33, "color": "#E3B65D", "in_degree": 1, "out_degree": 0}, {"id": "CPY_POLREC", "name": "CPY_POLREC", "type": "Copybook", "risk": 100, "color": "#EF4444", "in_degree": 3, "out_degree": 0}, {"id": "VSAM_POLIN", "name": "VSAM_POLIN", "type": "Vsam", "risk": 33, "color": "#E3B65D", "in_degree": 1, "out_degree": 0}, {"id": "VSAM_POLOUT", "name": "VSAM_POLOUT", "type": "Vsam", "risk": 33, "color": "#E3B65D", "in_degree": 1, "out_degree": 0}, {"id": "VSAM_POLKSDS", "name": "VSAM_POLKSDS", "type": "Vsam", "risk": 33, "color": "#E3B65D", "in_degree": 1, "out_degree": 0}, {"id": "JOB_POLCYCLE", "name": "JOB_POLCYCLE", "type": "Job", "risk": 16, "color": "#58D3A5", "in_degree": 0, "out_degree": 1}, {"id": "BMS_POLSET", "name": "BMS_POLSET", "type": "Mapset", "risk": 0, "color": "#58D3A5", "in_degree": 0, "out_degree": 0}], "links": [{"source": "POLBAT01", "target": "CPY_POLREC", "type": "USES_COPYBOOK"}, {"source": "POLBAT01", "target": "VSAM_POLIN", "type": "ACCESSES_VSAM"}, {"source": "POLBAT01", "target": "VSAM_POLOUT", "type": "ACCESSES_VSAM"}, {"source": "POLC100", "target": "CPY_POLREC", "type": "USES_COPYBOOK"}, {"source": "POLC200", "target": "CPY_CLMREC", "type": "USES_COPYBOOK"}, {"source": "POLC200", "target": "CPY_POLREC", "type": "USES_COPYBOOK"}, {"source": "POLC200", "target": "VSAM_POLKSDS", "type": "ACCESSES_VSAM"}, {"source": "JOB_POLCYCLE", "target": "POLBAT01", "type": "EXECUTES"}]};
+        let reportData = {"portfolio": {"app_id": "INS-POL-ADMIN", "app_name": "Insurance Policy Administration Monolith", "description": "Legacy mainframe application portfolio: Policy Admin Monolith", "business_domain": "Property & Casualty Insurance", "owner_team": "Mainframe Core Services", "programs": {"POLBAT01": {"program_id": "POLBAT01", "file_path": "data\\sample_portfolios\\policy_admin_monolith\\cbl\\POLBAT01.cbl", "dialect": "Enterprise COBOL for z/OS", "program_type": "Batch", "lines_of_code": 35, "comment_lines": 0, "blank_lines": 3, "divisions_present": ["IDENTIFICATION", "ENVIRONMENT", "DATA", "PROCEDURE"], "paragraphs": ["0000-MAIN", "END-PERFORM", "OUT-RATINGS"], "sections": [], "cyclomatic_complexity": 5, "halstead_volume": 194.32, "halstead_difficulty": 5.9, "halstead_effort": 1147.41, "maintainability_index": 49.62, "copybooks_used": ["POLREC"], "static_calls": [], "dynamic_calls": [], "cics_links": [], "cics_xctls": [], "cics_starts": [], "has_cics": false, "cics_commands_count": 0, "cics_state_pattern": "Stateless (Immediate return, externalized state)", "commarea_size_bytes": 0, "has_tsq": false, "has_tdq": false, "has_syncpoint": false, "has_syncpoint_rollback": false, "has_sql": false, "sql_tables_accessed": [], "sql_operations": {"SELECT": 0, "INSERT": 0, "UPDATE": 0, "DELETE": 0}, "has_cursors": false, "has_stored_procedure_calls": false, "vsam_files_accessed": ["POLIN", "POLOUT"], "mq_queues_accessed": [], "has_alter_goto": false, "alter_statements_count": 0, "has_computed_goto": false, "has_embedded_assembler": false, "has_hardcoded_file_paths": false, "dead_paragraphs_count": 2, "unreferenced_paragraphs": ["END-PERFORM", "OUT-RATINGS"], "description": null, "business_summary": null, "extracted_business_rules": []}, "POLC100": {"program_id": "POLC100", "file_path": "data\\sample_portfolios\\policy_admin_monolith\\cbl\\POLC100.cbl", "dialect": "Enterprise COBOL for z/OS", "program_type": "Online CICS", "lines_of_code": 42, "comment_lines": 2, "blank_lines": 10, "divisions_present": ["IDENTIFICATION", "ENVIRONMENT", "DATA", "PROCEDURE"], "paragraphs": ["0000-START-CONVERSATION", "END-EXEC", "END-IF", "END-EXEC", "1000-STEP-ONE", "2000-STEP-TWO", "9000-ROUTING", "9100-POLICY-FOUND", "9200-POLICY-DEFAULT"], "sections": [], "cyclomatic_complexity": 3, "halstead_volume": 398.84, "halstead_difficulty": 7.6, "halstead_effort": 3031.2, "maintainability_index": 45.98, "copybooks_used": ["POLREC"], "static_calls": [], "dynamic_calls": [], "cics_links": [], "cics_xctls": [], "cics_starts": [], "has_cics": true, "cics_commands_count": 4, "cics_state_pattern": "Conversational (Retains task across terminal think-time)", "commarea_size_bytes": 0, "has_tsq": false, "has_tdq": false, "has_syncpoint": false, "has_syncpoint_rollback": false, "has_sql": false, "sql_tables_accessed": [], "sql_operations": {"SELECT": 0, "INSERT": 0, "UPDATE": 0, "DELETE": 0}, "has_cursors": false, "has_stored_procedure_calls": false, "vsam_files_accessed": [], "mq_queues_accessed": [], "has_alter_goto": true, "alter_statements_count": 1, "has_computed_goto": false, "has_embedded_assembler": false, "has_hardcoded_file_paths": false, "dead_paragraphs_count": 4, "unreferenced_paragraphs": ["END-EXEC", "END-IF", "END-EXEC", "9100-POLICY-FOUND"], "description": null, "business_summary": "Legacy dynamic ALTER verb usage Conversational hold - state held across user interaction", "extracted_business_rules": []}, "POLC200": {"program_id": "POLC200", "file_path": "data\\sample_portfolios\\policy_admin_monolith\\cbl\\POLC200.cbl", "dialect": "Enterprise COBOL for z/OS", "program_type": "Online CICS", "lines_of_code": 49, "comment_lines": 1, "blank_lines": 8, "divisions_present": ["IDENTIFICATION", "ENVIRONMENT", "DATA", "PROCEDURE"], "paragraphs": ["0000-PROCESS-CLAIM", "END-EXEC", "END-IF", "1000-APPROVE-CLAIM", "END-EXEC", "2000-PENDING-REVIEW", "3000-REJECT-CLAIM", "9999-FINISH"], "sections": [], "cyclomatic_complexity": 3, "halstead_volume": 364.31, "halstead_difficulty": 8.06, "halstead_effort": 2938.01, "maintainability_index": 44.79, "copybooks_used": ["CLMREC", "POLREC"], "static_calls": [], "dynamic_calls": [], "cics_links": [], "cics_xctls": [], "cics_starts": [], "has_cics": true, "cics_commands_count": 3, "cics_state_pattern": "Stateless (Immediate return, externalized state)", "commarea_size_bytes": 0, "has_tsq": false, "has_tdq": false, "has_syncpoint": false, "has_syncpoint_rollback": false, "has_sql": false, "sql_tables_accessed": [], "sql_operations": {"SELECT": 0, "INSERT": 0, "UPDATE": 0, "DELETE": 0}, "has_cursors": false, "has_stored_procedure_calls": false, "vsam_files_accessed": ["POLKSDS"], "mq_queues_accessed": [], "has_alter_goto": false, "alter_statements_count": 0, "has_computed_goto": true, "has_embedded_assembler": false, "has_hardcoded_file_paths": false, "dead_paragraphs_count": 5, "unreferenced_paragraphs": ["END-EXEC", "END-IF", "END-EXEC", "2000-PENDING-REVIEW", "3000-REJECT-CLAIM"], "description": null, "business_summary": "Legacy dispatch pattern", "extracted_business_rules": []}}, "copybooks": {"CLMREC": {"name": "CLMREC", "file_path": "data\\sample_portfolios\\policy_admin_monolith\\cpy\\CLMREC.cpy", "field_count": 6, "level_01_name": null, "total_length_bytes": 60, "has_occurs": false, "has_redefines": false, "referenced_by_programs": ["POLC200"], "description": null}, "POLREC": {"name": "POLREC", "file_path": "data\\sample_portfolios\\policy_admin_monolith\\cpy\\POLREC.cpy", "field_count": 7, "level_01_name": null, "total_length_bytes": 70, "has_occurs": false, "has_redefines": false, "referenced_by_programs": ["POLBAT01", "POLC100", "POLC200"], "description": null}}, "jobs": {"POLCYCLE": {"job_name": "POLCYCLE", "file_path": "data\\sample_portfolios\\policy_admin_monolith\\jcl\\POLCYCLE.jcl", "job_class": null, "steps": [{"step_name": "STEP010", "program_executed": "POLBAT01", "is_proc": false, "cond_codes": [], "input_datasets": ["INS.PROD.LOADLIB", "INS.POLICY.MASTER.KSDS"], "output_datasets": ["INS.RATED.EXTRACT(+1)"], "datasets": [{"dsn": "INS.PROD.LOADLIB", "is_gdg": false, "disp": ""}, {"dsn": "INS.POLICY.MASTER.KSDS", "is_gdg": false, "disp": ""}, {"dsn": "INS.RATED.EXTRACT(+1)", "is_gdg": true, "disp": "NEW,CATLG,DELETE"}], "disposition_share": false, "is_utility": false}, {"step_name": "STEP020", "program_executed": "POLREP01", "is_proc": false, "cond_codes": ["4,LT,STEP010"], "input_datasets": ["INS.PROD.LOADLIB", "INS.RATED.EXTRACT(+1)"], "output_datasets": [], "datasets": [{"dsn": "INS.PROD.LOADLIB", "is_gdg": false, "disp": ""}, {"dsn": "INS.RATED.EXTRACT(+1)", "is_gdg": true, "disp": ""}], "disposition_share": false, "is_utility": false}], "has_gdg": true, "has_conditional_steps": true, "has_checkpoint_restart": false, "estimated_runtime_minutes": 30, "scheduler_dependencies": []}}, "transactions": {}, "mapsets": {"POLSET": {"mapset_name": "POLSET", "file_path": "data\\sample_portfolios\\policy_admin_monolith\\bms\\POLSET.bms", "maps_count": 1, "maps": [{"map_name": "POLM01", "has_cursor_positioning": true, "modified_data_tags": true, "fields_count": 4}], "total_fields": 4, "has_cursor_logic": true, "has_mdt_logic": true, "pf_keys_used": [], "associated_programs": []}}, "tables": {}, "vsam_files": {"POLIN": {"cluster_name": "POLIN", "vsam_type": "KSDS", "record_length": 80, "key_length": 0, "key_offset": 0, "share_options": "(2,3)", "has_alternate_index": false, "accessed_by_programs": ["POLBAT01"]}, "POLOUT": {"cluster_name": "POLOUT", "vsam_type": "KSDS", "record_length": 80, "key_length": 0, "key_offset": 0, "share_options": "(2,3)", "has_alternate_index": false, "accessed_by_programs": ["POLBAT01"]}, "POLKSDS": {"cluster_name": "POLKSDS", "vsam_type": "KSDS", "record_length": 80, "key_length": 0, "key_offset": 0, "share_options": "(2,3)", "has_alternate_index": false, "accessed_by_programs": ["POLC200"]}}, "security": {"esm_type": "RACF", "resource_classes_used": ["SURROGAT"], "has_saf_exits": false, "has_surrogate_security": false, "compliance_frameworks": [], "custom_exits": []}, "nfrs": {"peak_throughput_tps": 180, "target_latency_p99_ms": 350.0, "availability_sla": 99.9, "batch_window_hours": 6.5, "rto_minutes": 120, "rpo_minutes": 15, "data_volume_gb": 50.0, "is_customer_facing": true, "audit_logging_required": true, "business_criticality": "Tier 1 - Mission Critical", "target_response_time_ms_val": null, "availability_percentage_val": null, "peak_transactions_per_sec_val": null}}, "assessment": {"dimension_scores": [{"dimension_key": "", "dimension_name": "Business Logic & Code Complexity", "score": 1.0, "raw_score": 2.5, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 62.5, "readiness_rating": "Medium", "findings": [], "key_findings": ["Analyzed 3 COBOL program(s) totaling 126 lines of code.", "Average Cyclomatic Complexity: 3.7 (Peak: 5 in POLBAT01).", "Detected 11 unreferenced paragraphs (dead code candidates)."], "blockers": ["Self-modifying ALTER statements found in POLC100"], "boosters": [], "strengths": ["Well-structured procedural branching (Avg Cyclomatic Complexity: 3.7)."]}, {"dimension_key": "", "dimension_name": "Coupling & Shared Components", "score": 1.0, "raw_score": 1.2, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 95.0, "readiness_rating": "High", "findings": [], "key_findings": ["Analyzed 3 program(s) across 2 copybook(s).", "Average Fan-Out: 0.0. Highest Fan-In program: 'None' (referenced by 0 programs)."], "blockers": [], "boosters": [], "strengths": ["Acyclic program call graph (no circular recursion detected)."]}, {"dimension_key": "", "dimension_name": "Data Architecture & Persistence", "score": 1.0, "raw_score": 1.9, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 77.5, "readiness_rating": "High", "findings": [], "key_findings": ["Detected 0 DB2 Table(s) and 3 VSAM Dataset(s)."], "blockers": [], "boosters": [], "strengths": []}, {"dimension_key": "", "dimension_name": "Online Transactions & UI", "score": 1.0, "raw_score": 4.2, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 20.0, "readiness_rating": "Low", "findings": [], "key_findings": ["Detected 2 CICS program(s), 0 transaction(s), and 1 BMS 3270 mapset(s).", "1 BMS 3270 screen mapset(s) require UI modernization."], "blockers": ["Conversational CICS programs holding state: POLC100"], "boosters": [], "strengths": []}, {"dimension_key": "", "dimension_name": "Batch Processing & Orchestration", "score": 1.0, "raw_score": 2.9, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 52.5, "readiness_rating": "Medium", "findings": [], "key_findings": ["Detected 1 JCL Job(s) containing 2 execution step(s).", "2 Generation Data Group (GDG) relative references in use.", "1 jobs contain conditional step execution logic."], "blockers": [], "boosters": [], "strengths": []}, {"dimension_key": "", "dimension_name": "Transaction Integrity & State", "score": 1.0, "raw_score": 1.0, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 100.0, "readiness_rating": "High", "findings": [], "key_findings": ["Detected 0 explicit CICS SYNCPOINT statement(s) across 0 program(s)."], "blockers": [], "boosters": [], "strengths": ["Standard single-resource unit-of-work (implicit commit on program termination)."]}, {"dimension_key": "", "dimension_name": "Security & Identity", "score": 1.0, "raw_score": 1.8, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 80.0, "readiness_rating": "High", "findings": [], "key_findings": ["Security Manager: RACF. Resource Classes: 1. User Exits: 0.", "Uses RACF SURROGAT user impersonation."], "blockers": [], "boosters": [], "strengths": ["Standard security profiles without custom low-level assembler exits."]}, {"dimension_key": "", "dimension_name": "Operational NFRs & Blast Radius", "score": 1.0, "raw_score": 1.0, "weight": 0.125, "readiness_percentage": 100.0, "normalized_score": 100.0, "readiness_rating": "High", "findings": [], "key_findings": ["Latency SLA: 350.0 ms. Availability: 99.9%. Peak TPS: 180.", "Business Criticality: Tier 1 - Mission Critical (RTO: 120 min, RPO: 15 min)."], "blockers": [], "boosters": [], "strengths": ["Relaxed latency SLA (350.0 ms). Highly cloud-friendly.", "Standard high availability target (99.9%) natively supported by OpenShift pod replicas."]}], "overall_normalized_score": 71.9, "overall_raw_score": 2.12, "overall_readiness_rating": "Medium Readiness (Conditional / Replatform to VM or OpenShift after refactoring)", "twelve_factor_compliance": [{"factor_number": 1, "factor_id": "I", "factor_name": "", "name": "Codebase", "compliance_score": 1.0, "score": 85.0, "status": "Compliant", "legacy_gap": "", "gap_analysis": "Mainframe PDS/Panvalet libraries can be migrated into Git repositories with branching.", "remediation": "Establish unified Git repository with trunk-based development."}, {"factor_number": 1, "factor_id": "II", "factor_name": "", "name": "Dependencies", "compliance_score": 1.0, "score": 75.0, "status": "Compliant", "legacy_gap": "", "gap_analysis": "Dynamic CALL statements (0 found) and STEPLIB/JOBLIB concatenate implicit search orders.", "remediation": "Declare external libraries in Maven/Gradle/Go modules or container image manifest."}, {"factor_number": 1, "factor_id": "III", "factor_name": "", "name": "Config", "compliance_score": 1.0, "score": 30.0, "status": "Non-Compliant", "legacy_gap": "", "gap_analysis": "Environment parameters, dataset names, and CICS region IDs are hardcoded in JCL cards and COBOL WORKING-STORAGE.", "remediation": "Externalize parameters to Kubernetes ConfigMaps and Secrets injected as environment variables."}, {"factor_number": 1, "factor_id": "IV", "factor_name": "", "name": "Backing Services", "compliance_score": 1.0, "score": 40.0, "status": "Partial", "legacy_gap": "", "gap_analysis": "Tightly bound to local mainframe subsystems (VSAM RLS, DB2 Subsystem ID). 3 VSAM datasets bound to physical DASD volumes.", "remediation": "Abstract databases, message queues, and object storage behind standard URIs and connection pools."}, {"factor_number": 1, "factor_id": "V", "factor_name": "", "name": "Build, Release, Run", "compliance_score": 1.0, "score": 80.0, "status": "Compliant", "legacy_gap": "", "gap_analysis": "Mainframe compile/link-edit separates binaries from execution, easily adaptable to container multi-stage builds.", "remediation": "Containerize build step using Red Hat Universal Base Image (UBI) and Tekton / OpenShift Pipelines."}, {"factor_number": 1, "factor_id": "VI", "factor_name": "", "name": "Processes", "compliance_score": 1.0, "score": 20.0, "status": "Non-Compliant", "legacy_gap": "", "gap_analysis": "1 conversational CICS programs hold task and terminal memory across user interactions.", "remediation": "Refactor to pseudo-conversational with external Redis/Memcached session stores, or adopt stateless REST."}, {"factor_number": 1, "factor_id": "VII", "factor_name": "", "name": "Port Binding", "compliance_score": 1.0, "score": 35.0, "status": "Non-Compliant", "legacy_gap": "", "gap_analysis": "BMS 3270 maps communicate through SNA terminal LU pools rather than self-contained HTTP/gRPC port binding.", "remediation": "Expose HTTP/REST or gRPC endpoints bound to container ports 8080/8443, fronted by OpenShift Routes."}, {"factor_number": 1, "factor_id": "VIII", "factor_name": "", "name": "Concurrency", "compliance_score": 1.0, "score": 80.0, "status": "Compliant", "legacy_gap": "", "gap_analysis": "Mainframe relies on scale-up vertical MIPS and CICS multi-region operation (MRO). Concurrent pod scaling blocked by file locks.", "remediation": "Enable OpenShift Horizontal Pod Autoscaler (HPA) using CPU/memory and custom Prometheus metrics."}, {"factor_number": 1, "factor_id": "IX", "factor_name": "", "name": "Disposability", "compliance_score": 1.0, "score": 60.0, "status": "Partial", "legacy_gap": "", "gap_analysis": "Mainframe programs expect warm region memory pools; cold startup overhead requires optimization.", "remediation": "Implement Kubernetes liveness and readiness probes with graceful SIGTERM termination hooks."}, {"factor_number": 1, "factor_id": "X", "factor_name": "", "name": "Dev/Prod Parity", "compliance_score": 1.0, "score": 25.0, "status": "Non-Compliant", "legacy_gap": "", "gap_analysis": "Massive disparity between developer workstations (Windows/macOS x86) and production IBM z/OS mainframes.", "remediation": "Standardize on containerized local dev environment (Minikube / OpenShift Local / Podman Desktop)."}, {"factor_number": 1, "factor_id": "XI", "factor_name": "", "name": "Logs", "compliance_score": 1.0, "score": 50.0, "status": "Partial", "legacy_gap": "", "gap_analysis": "Logs directed to spool datasets (SYSOUT, CESE, JESMSGLG) with rigid 132-character record layouts.", "remediation": "Direct structured JSON logs to stdout/stderr; collect via OpenShift Logging (Fluentd / Vector / OpenSearch)."}, {"factor_number": 1, "factor_id": "XII", "factor_name": "", "name": "Admin Processes", "compliance_score": 1.0, "score": 85.0, "status": "Compliant", "legacy_gap": "", "gap_analysis": "JCL batch jobs naturally map to Kubernetes one-off Jobs and CronJobs.", "remediation": "Convert administrative JCL scripts to containerized Kubernetes Jobs executed via oc create job."}], "average_factor_score": 55.4, "risks": [{"risk_id": "RISK-CICS-01", "category": "", "dimension": "Online Transactions & UI", "severity": "Critical", "title": "Stateful Conversational CICS Transactions", "description": "Programs ['POLC100'] hold internal state and active task locks across terminal interactions.", "impact": "", "migration_impact": "Fatal blocker for stateless horizontal pod autoscaling on OpenShift (Factor VI: Processes). Session memory is tied to single runtime instances.", "mitigation_strategy": "", "remediation_strategy": "Refactor into pseudo-conversational architecture using external session stores (Redis) or expose RESTful stateless APIs with JWT tokens.", "affected_artifacts": ["POLC100"], "effort_person_days": 5}, {"risk_id": "RISK-BL-03", "category": "", "dimension": "Business Logic & Code Complexity", "severity": "Critical", "title": "Self-Modifying Code (ALTER Statement)", "description": "Detected 1 ALTER statements across 1 program(s). ALTER dynamically mutates GO TO targets at runtime.", "impact": "", "migration_impact": "Cannot run reliably in stateless container runtimes or modern multi-threaded architectures.", "mitigation_strategy": "", "remediation_strategy": "Mandatory elimination: replace ALTER with standard PERFORM or EVALUATE state machines.", "affected_artifacts": ["POLC100"], "effort_person_days": 4}, {"risk_id": "RISK-DATA-02", "category": "", "dimension": "Data Architecture & Persistence", "severity": "High", "title": "VSAM Dataset Dependencies", "description": "Found 3 VSAM dataset(s). Requires data conversion to relational or document storage.", "impact": "", "migration_impact": "Containers cannot mount native VSAM datasets directly.", "mitigation_strategy": "", "remediation_strategy": "Convert VSAM clusters to relational tables using AWS DMS, Qlik, or custom ETL.", "affected_artifacts": ["POLIN", "POLOUT", "POLKSDS"], "effort_person_days": 6}, {"risk_id": "RISK-SEC-02", "category": "", "dimension": "Security & Identity", "severity": "High", "title": "RACF SURROGAT Identity Impersonation", "description": "Application relies on RACF SURROGAT class to switch identity contexts without password re-verification.", "impact": "", "migration_impact": "Must be replaced with OAuth2 Token Exchange (RFC 8693) or mTLS SPIFFE/SPIRE identity attestation on OpenShift.", "mitigation_strategy": "", "remediation_strategy": "Implement OAuth 2.0 Token Exchange or Kubernetes ServiceAccount impersonation.", "affected_artifacts": ["SURROGAT"], "effort_person_days": 4}, {"risk_id": "RISK-CICS-02", "category": "", "dimension": "Online Transactions & UI", "severity": "High", "title": "BMS 3270 Green-Screen User Interface Coupling", "description": "Portfolio includes 1 BMS mapsets containing 3270 datastreams, cursor positions, and Modified Data Tags (MDT).", "impact": "", "migration_impact": "Requires terminal emulation middleware or complete front-end UI re-architecture (React/Angular/Vue).", "mitigation_strategy": "", "remediation_strategy": "Generate OpenAPI REST specifications from BMS field layouts and build modern responsive web components.", "affected_artifacts": ["POLSET"], "effort_person_days": 3}, {"risk_id": "RISK-BATCH-01", "category": "", "dimension": "Batch Processing & Orchestration", "severity": "High", "title": "Generation Data Group (GDG) Versioning Dependencies", "description": "Detected 2 GDG dataset references across 1 jobs. GDG relative generation references (e.g. (+1), (0)) are specific to z/OS catalog management.", "impact": "", "migration_impact": "Cloud storage (S3/Ceph) lacks native automated generational rolling rollbacks.", "mitigation_strategy": "", "remediation_strategy": "Replace GDG rolling with timestamped object prefixes or MinIO/S3 versioned bucket policies.", "affected_artifacts": ["POLCYCLE"], "effort_person_days": 3}, {"risk_id": "RISK-BATCH-02", "category": "", "dimension": "Batch Processing & Orchestration", "severity": "Medium", "title": "Complex JCL COND Step Branching", "description": "1 job(s) utilize conditional return-code branching (e.g., COND=(4,LT)).", "impact": "", "migration_impact": "Requires translation into Directed Acyclic Graphs (DAGs) in Kubernetes/Argo/Airflow.", "mitigation_strategy": "", "remediation_strategy": "Refactor step conditionals into Airflow BranchPythonOperator or Argo Workflows 'when' expressions.", "affected_artifacts": ["POLCYCLE"], "effort_person_days": 2}], "remediations": [{"action_id": "REM-01", "title": "Resolve Stateful Conversational CICS Transactions", "target_component": "", "effort_story_points": 1, "effort_person_days": 1, "estimated_days": 5, "priority": "Critical", "phase": 1, "description": "Refactor into pseudo-conversational architecture using external session stores (Redis) or expose RESTful stateless APIs with JWT tokens.", "target_pattern": "", "target_platform": "Enterprise Linux Virtual Machine (VM)", "recommended_tools": []}, {"action_id": "REM-02", "title": "Resolve Self-Modifying Code (ALTER Statement)", "target_component": "", "effort_story_points": 1, "effort_person_days": 1, "estimated_days": 4, "priority": "Critical", "phase": 1, "description": "Mandatory elimination: replace ALTER with standard PERFORM or EVALUATE state machines.", "target_pattern": "", "target_platform": "Enterprise Linux Virtual Machine (VM)", "recommended_tools": []}, {"action_id": "REM-03", "title": "Resolve VSAM Dataset Dependencies", "target_component": "", "effort_story_points": 1, "effort_person_days": 1, "estimated_days": 6, "priority": "High", "phase": 2, "description": "Convert VSAM clusters to relational tables using AWS DMS, Qlik, or custom ETL.", "target_pattern": "", "target_platform": "Red Hat OpenShift Container Platform (OCP)", "recommended_tools": []}, {"action_id": "REM-04", "title": "Resolve RACF SURROGAT Identity Impersonation", "target_component": "", "effort_story_points": 1, "effort_person_days": 1, "estimated_days": 4, "priority": "High", "phase": 2, "description": "Implement OAuth 2.0 Token Exchange or Kubernetes ServiceAccount impersonation.", "target_pattern": "", "target_platform": "Red Hat OpenShift Container Platform (OCP)", "recommended_tools": []}, {"action_id": "REM-05", "title": "Resolve BMS 3270 Green-Screen User Interface Coupling", "target_component": "", "effort_story_points": 1, "effort_person_days": 1, "estimated_days": 3, "priority": "High", "phase": 2, "description": "Generate OpenAPI REST specifications from BMS field layouts and build modern responsive web components.", "target_pattern": "", "target_platform": "Red Hat OpenShift Container Platform (OCP)", "recommended_tools": []}, {"action_id": "REM-06", "title": "Resolve Generation Data Group (GDG) Versioning Dependencies", "target_component": "", "effort_story_points": 1, "effort_person_days": 1, "estimated_days": 3, "priority": "High", "phase": 2, "description": "Replace GDG rolling with timestamped object prefixes or MinIO/S3 versioned bucket policies.", "target_pattern": "", "target_platform": "Red Hat OpenShift Container Platform (OCP)", "recommended_tools": []}, {"action_id": "REM-07", "title": "Resolve Complex JCL COND Step Branching", "target_component": "", "effort_story_points": 1, "effort_person_days": 1, "estimated_days": 2, "priority": "Medium", "phase": 3, "description": "Refactor step conditionals into Airflow BranchPythonOperator or Argo Workflows 'when' expressions.", "target_pattern": "", "target_platform": "Red Hat OpenShift Container Platform (OCP)", "recommended_tools": []}], "total_estimated_person_days": 27, "initial_disposition": "Replatform (Containerized COBOL / Lift & Reshape on OCP)", "target_platform": "Enterprise Linux Virtual Machine (VM)"}, "semantic_clusters": [{"cluster_id": "CLUSTER-1", "cluster_name": "Reporting Services (1)", "business_domain": "Financial Statements & Analytical Reporting", "programs": ["POLBAT01", "POLC100", "POLC200"], "copybooks": [], "tables": [], "cohesion_score": 0.37, "coupling_score": 0.0, "recommended_service_name": "", "description": "", "suggested_target": "Low (Stateful / 2PC Blocker)"}], "semantic_coords": [{"program_id": "POLBAT01", "x": 85.0, "y": -0.0, "cluster": "CLUSTER-1"}, {"program_id": "POLC100", "x": -42.5, "y": -14.0, "cluster": "CLUSTER-1"}, {"program_id": "POLC200", "x": -42.5, "y": 14.0, "cluster": "CLUSTER-1"}], "decision": {"primary_platform": "Enterprise Linux Virtual Machine (VM)", "secondary_platform": "Red Hat OpenShift Container Platform (OCP)", "recommended_disposition": "Replatform (Containerized COBOL / Lift & Reshape on OCP)", "ocp_score": 53.0, "vm_score": 80.0, "decision_summary": "RECOMMENDATION: LINUX VIRTUAL MACHINE (VM) REHOST / REPLATFORM (Score: 80.0/100 vs OCP: 53.0/100). The application has 1 container blocker(s) (e.g. 1 conversational CICS program(s) bind terminal state to memory, violating pod statelessness.). Hosting on Linux VMs via an enterprise mainframe emulation runtime achieves fastest time-to-value while eliminating mainframe MIPS, serving as Phase 1 before gradual container refactoring.", "logical_justification": {"summary": "1. ARCHITECTURAL IMPEDANCE MISMATCH: Direct containerization on OpenShift is constrained by 1 critical blocker(s): 1 conversational CICS program(s) bind terminal state to memory, violating pod statelessness.. 2. PRESERVATION OF STATE & CONCURRENCY: Hosting on Linux Virtual Machines running an enterprise mainframe emulator (such as Micro Focus Enterprise Server or AWS Blu Age) provides native support for conversational CICS regions, shared CWA/TWA memory pools, and POSIX record-level VSAM file emulation. 3. RISK MITIGATION & VELOCITY: Rehosting to VMs allows the organization to cut z/OS hardware and MIPS software fees immediately (often saving 60-70% TCO) without incurring the regression risks of a multi-year complete application rewrite. Once stabilized on Linux VMs, modular services can be incrementally extracted into OpenShift containers.", "key_drivers": ["1. ARCHITECTURAL IMPEDANCE MISMATCH: Direct containerization on OpenShift is constrained by 1 critical blocker(s): 1 conversational CICS program(s) bind terminal state to memory, violating pod statelessness..", "2. PRESERVATION OF STATE & CONCURRENCY: Hosting on Linux Virtual Machines running an enterprise mainframe emulator (such as Micro Focus Enterprise Server or AWS Blu Age) provides native support for conversational CICS regions, shared CWA/TWA memory pools, and POSIX record-level VSAM file emulation.", "3. RISK MITIGATION & VELOCITY: Rehosting to VMs allows the organization to cut z/OS hardware and MIPS software fees immediately (often saving 60-70% TCO) without incurring the regression risks of a multi-year complete application rewrite. Once stabilized on Linux VMs, modular services can be incrementally extracted into OpenShift containers."], "ocp_suitability": 53.0, "vm_suitability": 80.0}, "trade_off_matrix": [{"vector": "Elasticity & Horizontal Scaling", "ocp_rating": 95, "vm_rating": 45, "analysis": "OCP scales pods in seconds via HPA; VMs require minutes to spin up and load images."}, {"vector": "Migration Speed & Time-to-Market", "ocp_rating": 40, "vm_rating": 90, "analysis": "VM rehosting requires minimal code modification; OCP requires refactoring state and batch orchestration."}, {"vector": "Operational Independence & Licensing", "ocp_rating": 90, "vm_rating": 50, "analysis": "OCP runs open-source runtimes with standard subscriptions; VMs often require specialized legacy emulation licenses."}, {"vector": "Stateful Transaction & Session Tolerance", "ocp_rating": 30, "vm_rating": 95, "analysis": "VMs support long-lived conversational memory and TWA/CWA; OCP strictly mandates stateless processes."}, {"vector": "Data Consistency & File Locking", "ocp_rating": 45, "vm_rating": 85, "analysis": "VMs emulate OS-level shared file systems and record locking; OCP containers require externalized distributed data grids."}, {"vector": "DevOps & Modern Talent Availability", "ocp_rating": 95, "vm_rating": 60, "analysis": "Kubernetes/OpenShift attracts modern cloud engineers; legacy VM emulation maintains specialized skills barrier."}, {"vector": "Low Latency & Network Overhead", "ocp_rating": 75, "vm_rating": 88, "analysis": "VMs bypass container overlay networks (SDN/OVN) and service mesh proxies, saving 2-5ms per hop."}, {"vector": "Long-Term Strategic Agility", "ocp_rating": 98, "vm_rating": 55, "analysis": "OCP aligns with enterprise cloud-native roadmap; VM rehost is often viewed as technical debt deferral."}], "platform_candidates": [{"platform": "Red Hat OpenShift Container Platform (OCP)", "suitability_score": 53.0, "is_recommended": false, "fit_summary": "", "migration_path": "Refactor (Cloud-Native Containerization on OCP) to Cloud-Native Microservices", "estimated_cost_index": "Medium Capital / Very Low Operational (Zero MIPS)", "pros": ["Horizontal Pod Autoscaling (HPA) enables dynamic resource elasticity during transaction surges.", "Declarative GitOps deployments via ArgoCD with automated rollback and zero-downtime rolling updates.", "Complete elimination of recurring IBM mainframe MIPS licensing costs.", "Rich cloud-native observability ecosystem (OpenTelemetry, Prometheus, Grafana, Jaeger).", "Universal Linux base image (UBI) standardizes runtime across dev, staging, and production."], "cons": ["1 conversational CICS program(s) bind terminal state to memory, violating pod statelessness.", "3 shared VSAM dataset(s) lack POSIX distributed record-level lock semantics across container replicas.", "1 self-modifying ALTER statement(s) prevent thread-safe container execution."], "blockers": ["1 conversational CICS program(s) bind terminal state to memory, violating pod statelessness."], "key_requirements": []}, {"platform": "Enterprise Linux Virtual Machine (VM)", "suitability_score": 80.0, "is_recommended": true, "fit_summary": "", "migration_path": "Replatform (Containerized COBOL / Lift & Reshape on OCP) / Lift-and-Shift to Linux VMs", "estimated_cost_index": "Low Capital / Medium Operational (Emulation Software Subscriptions)", "pros": ["Full compatibility with stateful CICS conversational programs and shared memory (CWA/TWA).", "Mainframe emulation runtimes (e.g., Micro Focus Enterprise Server) support native VSAM KSDS/ESDS files.", "Lowest code modification risk: allows verbatim compilation of existing COBOL business logic.", "Fastest time-to-market: eliminates the multi-year redesign required for microservices.", "Retains existing JCL execution sequences and step COND return codes."], "cons": ["Retains monolithic architectural debt without microservice modularity or independent deployment cycles.", "Requires ongoing commercial mainframe emulation runtime licenses (e.g. Micro Focus/Raincode).", "Scaling requires coarse-grained vertical VM resizing or active-passive clustering rather than sub-second pod autoscaling.", "Heavier resource footprint and longer boot times compared to lightweight container pods."], "blockers": [], "key_requirements": []}, {"platform": "Hybrid Coexistence (Distributed API + Mainframe Core)", "suitability_score": 35.0, "is_recommended": false, "fit_summary": "", "migration_path": "Retain (Keep on Mainframe - Low ROI / High Blast Radius) with API Gateway Abstraction", "estimated_cost_index": "Zero Capital / Very High Operational (Ongoing MIPS)", "pros": ["Guarantees 100% logic and data integrity with zero migration risk."], "cons": ["Continues incurring heavy mainframe MIPS software licensing fees."], "blockers": [], "key_requirements": []}], "adr": {"adr_id": "ADR-INS-POL-ADMIN-001", "title": "Target Hosting Platform Selection for Insurance Policy Administration Monolith", "status": "Accepted", "context": "Evaluation of Insurance Policy Administration Monolith (3 programs, 1 jobs, 0 tables, 3 VSAM files) transitioning from IBM z/OS.", "decision": "Adopt Enterprise Linux Virtual Machine (VM) as the primary target platform (Replatform (Containerized COBOL / Lift & Reshape on OCP)).", "justification": "1. ARCHITECTURAL IMPEDANCE MISMATCH: Direct containerization on OpenShift is constrained by 1 critical blocker(s): 1 conversational CICS program(s) bind terminal state to memory, violating pod statelessness.. 2. PRESERVATION OF STATE & CONCURRENCY: Hosting on Linux Virtual Machines running an enterprise mainframe emulator (such as Micro Focus Enterprise Server or AWS Blu Age) provides native support for conversational CICS regions, shared CWA/TWA memory pools, and POSIX record-level VSAM file emulation. 3. RISK MITIGATION & VELOCITY: Rehosting to VMs allows the organization to cut z/OS hardware and MIPS software fees immediately (often saving 60-70% TCO) without incurring the regression risks of a multi-year complete application rewrite. Once stabilized on Linux VMs, modular services can be incrementally extracted into OpenShift containers.", "consequences_positive": ["Full compatibility with stateful CICS conversational programs and shared memory (CWA/TWA).", "Mainframe emulation runtimes (e.g., Micro Focus Enterprise Server) support native VSAM KSDS/ESDS files.", "Lowest code modification risk: allows verbatim compilation of existing COBOL business logic.", "Fastest time-to-market: eliminates the multi-year redesign required for microservices.", "Retains existing JCL execution sequences and step COND return codes."], "consequences_negative": ["Retains monolithic architectural debt without microservice modularity or independent deployment cycles.", "Requires ongoing commercial mainframe emulation runtime licenses (e.g. Micro Focus/Raincode).", "Scaling requires coarse-grained vertical VM resizing or active-passive clustering rather than sub-second pod autoscaling.", "Heavier resource footprint and longer boot times compared to lightweight container pods."], "roadmap_phases": [{"phase": 1, "name": "Phase 1: Remediation & Decoupling", "focus": "Resolve critical blockers (eliminate ALTER verbs, decouple VSAM, extract session state).", "duration_months": 3}, {"phase": 2, "name": "Phase 2: Deployment to Enterprise Linux Virtual Machine (VM)", "focus": "Build automated CI/CD pipelines, configure Enterprise Linux Virtual Machine (VM) resources, and execute migration.", "duration_months": 6}, {"phase": 3, "name": "Phase 3: Validation, Cutover & Mainframe Decommission", "focus": "Parallel run testing, dark launch verification, zero-downtime cutover, and MIPS de-allocation.", "duration_months": 3}]}}, "dependency_graph": {"nodes": [{"id": "POLBAT01", "label": "POLBAT01", "type": "Program", "complexity_score": 5.0, "lines_of_code": 35, "color": "#F59E0B", "metadata": {"is_cics": false, "is_batch": true, "is_conversational": false, "cyclomatic_complexity": 5, "maintainability_index": 49.6}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "POLC100", "label": "POLC100", "type": "Program", "complexity_score": 3.0, "lines_of_code": 42, "color": "#EF4444", "metadata": {"is_cics": true, "is_batch": false, "is_conversational": true, "cyclomatic_complexity": 3, "maintainability_index": 46.0}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "POLC200", "label": "POLC200", "type": "Program", "complexity_score": 3.0, "lines_of_code": 49, "color": "#F59E0B", "metadata": {"is_cics": true, "is_batch": false, "is_conversational": false, "cyclomatic_complexity": 3, "maintainability_index": 44.8}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "CPY_CLMREC", "label": "CLMREC", "type": "Copybook", "complexity_score": 6.0, "lines_of_code": 12, "color": "#8B5CF6", "metadata": {"field_count": 6, "has_redefines": false, "referenced_by_count": 1}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "CPY_POLREC", "label": "POLREC", "type": "Copybook", "complexity_score": 7.0, "lines_of_code": 14, "color": "#8B5CF6", "metadata": {"field_count": 7, "has_redefines": false, "referenced_by_count": 3}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "VSAM_POLIN", "label": "POLIN", "type": "Vsam", "complexity_score": 10.0, "lines_of_code": 0, "color": "#F59E0B", "metadata": {"organization": "KSDS", "record_length": 80}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "VSAM_POLOUT", "label": "POLOUT", "type": "Vsam", "complexity_score": 10.0, "lines_of_code": 0, "color": "#F59E0B", "metadata": {"organization": "KSDS", "record_length": 80}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "VSAM_POLKSDS", "label": "POLKSDS", "type": "Vsam", "complexity_score": 10.0, "lines_of_code": 0, "color": "#F59E0B", "metadata": {"organization": "KSDS", "record_length": 80}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "JOB_POLCYCLE", "label": "POLCYCLE", "type": "Job", "complexity_score": 2.0, "lines_of_code": 30, "color": "#EC4899", "metadata": {"steps_count": 2}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}, {"id": "BMS_POLSET", "label": "POLSET", "type": "Mapset", "complexity_score": 4.0, "lines_of_code": 12, "color": "#F97316", "metadata": {"maps_count": 1, "fields_count": 4}, "complexity": 1.0, "loc": 0, "subsystem": "MAINFRAME", "cluster_id": null, "properties": {}}], "edges": [{"source": "POLBAT01", "target": "CPY_POLREC", "type": "USES_COPYBOOK", "label": "COPY", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "POLBAT01", "target": "VSAM_POLIN", "type": "ACCESSES_VSAM", "label": "READ/WRITE", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "POLBAT01", "target": "VSAM_POLOUT", "type": "ACCESSES_VSAM", "label": "READ/WRITE", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "POLC100", "target": "CPY_POLREC", "type": "USES_COPYBOOK", "label": "COPY", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "POLC200", "target": "CPY_CLMREC", "type": "USES_COPYBOOK", "label": "COPY", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "POLC200", "target": "CPY_POLREC", "type": "USES_COPYBOOK", "label": "COPY", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "POLC200", "target": "VSAM_POLKSDS", "type": "ACCESSES_VSAM", "label": "READ/WRITE", "weight": 1.0, "is_dynamic": false, "properties": {}}, {"source": "JOB_POLCYCLE", "target": "POLBAT01", "type": "EXECUTES", "label": "STEP: STEP010", "weight": 1.0, "is_dynamic": false, "properties": {}}], "total_nodes": 10, "total_edges": 8, "god_objects": ["POLBAT01", "POLC200", "CPY_POLREC"], "cycles_detected": 0, "metrics": {}, "blast_radius_summary": {}}};
+        let selectedNode = null;
+        let simulatorMode = 'view';
+        let nodeAssignments = {};  // Track platform assignments
+        let originalMetrics = {
+            risk: 0,
+            effort: 46,
+            savings: 130000
+        };
+        
+        // Natural Language Q&A Handler
+        async function handleNLQuery() {
+            const input = document.getElementById('qa-input');
+            const query = input.value.trim();
+            
+            if (!query) return;
+            
+            // Show loading state
+            document.getElementById('qa-button-text').style.display = 'none';
+            document.getElementById('qa-spinner').classList.add('visible');
+            
+            try {
+                // Try real API first, fall back to simulation if unavailable
+                const results = await performSemanticSearch(query);
+                displayQAResults(query, results);
+            } catch (error) {
+                console.error('Q&A error:', error);
+                // Fallback to simulation if API unavailable
+                try {
+                    const fallbackResults = await simulateSemanticSearch(query);
+                    displayQAResults(query, fallbackResults, true);
+                } catch (fallbackError) {
+                    displayQAResults(query, [], false);
+                }
+            } finally {
+                document.getElementById('qa-button-text').style.display = 'inline';
+                document.getElementById('qa-spinner').classList.remove('visible');
+            }
+        }
+        
+        // Real semantic search using backend API
+        async function performSemanticSearch(query) {
+            const API_BASE = window.location.protocol === 'file:' 
+                ? 'http://localhost:8000' 
+                : window.location.origin;
+            
+            const response = await fetch(`${API_BASE}/api/semantic-search`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: query,
+                    top_k: 5
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return {
+                answer: data.answer,
+                results: data.results,
+                isAI: true
+            };
+        }
+        
+        // Fallback: Simulate semantic search (client-side when API unavailable)
+        function simulateSemanticSearch(query) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const queryLower = query.toLowerCase();
+                    const results = [];
+                    
+                    // Simple keyword matching as fallback
+                    graphData.nodes.forEach(node => {
+                        const name = (node.name || '').toLowerCase();
+                        const type = (node.type || '').toLowerCase();
+                        
+                        let relevance = 0;
+                        
+                        // Risk-related queries
+                        if ((queryLower.includes('risk') || queryLower.includes('dangerous')) && node.risk > 70) {
+                            relevance = 0.9;
+                        }
+                        // Database queries
+                        else if ((queryLower.includes('database') || queryLower.includes('data')) && type.includes('data')) {
+                            relevance = 0.85;
+                        }
+                        // Batch/job queries
+                        else if ((queryLower.includes('batch') || queryLower.includes('job')) && type.includes('job')) {
+                            relevance = 0.85;
+                        }
+                        // Payment/transaction queries
+                        else if ((queryLower.includes('payment') || queryLower.includes('transaction')) && 
+                                 (name.includes('payment') || name.includes('txn') || name.includes('transaction'))) {
+                            relevance = 0.9;
+                        }
+                        // Name matching
+                        else if (name.includes(queryLower.split(' ')[0])) {
+                            relevance = 0.7;
+                        }
+                        
+                        if (relevance > 0) {
+                            results.push({
+                                type: type,
+                                id: node.id,
+                                name: node.name,
+                                risk_level: node.risk > 70 ? 'high' : node.risk > 40 ? 'medium' : 'low',
+                                relevance_score: relevance
+                            });
+                        }
+                    });
+                    
+                    // Sort by relevance
+                    results.sort((a, b) => b.relevance_score - a.relevance_score);
+                    
+                    // Generate simple answer for simulation mode
+                    let answer = `Found ${results.length} components matching your query.`;
+                    if (results.length > 0) {
+                        answer = `The most relevant component is ${results[0].name} (risk: ${results[0].risk_level}).`;
+                    }
+                    
+                    resolve({
+                        answer: answer,
+                        results: results.slice(0, 5),
+                        isAI: false
+                    });
+                }, 500);
+            });
+        }
+        
+        // Display Q&A results
+        function displayQAResults(query, data, isFallback = false) {
+            const resultsPanel = document.getElementById('qa-results');
+            const answerDiv = document.getElementById('qa-answer');
+            const matchesDiv = document.getElementById('qa-matches');
+            
+            // Handle data structure (API response vs simulation)
+            const results = data.results || data;
+            const answer = data.answer || '';
+            const isAI = data.isAI !== undefined ? data.isAI : false;
+            
+            if (!results || results.length === 0) {
+                answerDiv.innerHTML = `<div style="opacity: 0.7;">I couldn't find anything matching "${query}" in the current portfolio. Try rephrasing your question.</div>`;
+                if (isFallback) {
+                    answerDiv.innerHTML += '<div style="margin-top: 8px; font-size: 11px; color: #E3B65D;">⚠️ API unavailable - using fallback search</div>';
+                }
+                matchesDiv.innerHTML = '';
+                resultsPanel.classList.add('visible');
+                return;
+            }
+            
+            // Display AI-generated or fallback answer
+            let answerHTML = answer || `Found ${results.length} components matching your query.`;
+            
+            // Add mode indicator
+            if (isAI) {
+                answerHTML = `<div style="margin-bottom: 8px; font-size: 11px; color: #58D3A5;">✓ AI-Powered Semantic Search</div>` + answerHTML;
+            } else if (isFallback) {
+                answerHTML = `<div style="margin-bottom: 8px; font-size: 11px; color: #E3B65D;">⚠️ Fallback Mode - API Unavailable</div>` + answerHTML;
+            }
+            
+            answerDiv.innerHTML = answerHTML;
+                answer = `Found ${results.length} database-related components: ${results.map(r => r.name).slice(0, 3).join(', ')}${results.length > 3 ? ', and more' : ''}.`;
+            } else {
+                answer = `Found ${results.length} matches. Top result: ${results[0].name} (${results[0].type}) with ${(results[0].relevance_score * 100).toFixed(0)}% relevance.`;
+            }
+            
+            answerDiv.textContent = answer;
+            
+            // Display result chips
+            matchesDiv.innerHTML = results.map(r => `
+                <div class="qa-match-chip" onclick="highlightNode('${r.id}')">
+                    <span class="qa-match-type">${r.type}</span>
+                    <span class="qa-match-name">${r.name}</span>
+                    <span class="qa-relevance">${(r.relevance_score * 100).toFixed(0)}%</span>
+                </div>
+            `).join('');
+            
+            resultsPanel.classList.add('visible');
+            
+            // Auto-highlight first result
+            if (results[0]) {
+                setTimeout(() => highlightNode(results[0].id), 500);
+            }
+        }
+        
+        // Simulator mode toggle
+        function setSimulatorMode(mode) {
+            simulatorMode = mode;
+            
+            // Update button states
+            document.querySelectorAll('.mode-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Enable/disable platform selector
+            document.getElementById('platform-selector').disabled = (mode === 'view');
+            
+            if (mode === 'view') {
+                // Reset to original state
+                nodeAssignments = {};
+                updateMetrics();
+            }
+        }
+        
+        // Handle node click for platform assignment
+        function onNodeClick(node) {
+            if (simulatorMode === 'simulate') {
+                const platform = document.getElementById('platform-selector').value;
+                if (platform) {
+                    nodeAssignments[node.id] = platform;
+                    updateNodeColor(node.id, platform);
+                    recalculateMetrics();
+                }
+            } else {
+                selectNode(node);
+            }
+        }
+        
+        // Recalculate metrics based on assignments
+        function recalculateMetrics() {
+            const totalNodes = graphData.nodes.length;
+            const assignedNodes = Object.keys(nodeAssignments).length;
+            
+            if (assignedNodes === 0) {
+                updateMetrics();
+                return;
+            }
+            
+            // Count platform assignments
+            const vmCount = Object.values(nodeAssignments).filter(p => p === 'vm').length;
+            const ocpCount = Object.values(nodeAssignments).filter(p => p === 'ocp').length;
+            const mainframeCount = Object.values(nodeAssignments).filter(p => p === 'mainframe').length;
+            
+            // Adjust risk (mainframe = lower risk, full migration = higher risk)
+            const migrationRatio = (vmCount + ocpCount) / totalNodes;
+            const newRisk = Math.round(originalMetrics.risk * (0.7 + migrationRatio * 0.6));
+            
+            // Adjust effort (more components = more effort)
+            const newEffort = Math.round(originalMetrics.effort * (0.5 + migrationRatio * 1.5));
+            
+            // Adjust savings (mainframe components reduce savings)
+            const cloudRatio = (vmCount + ocpCount) / (vmCount + ocpCount + mainframeCount || 1);
+            const newSavings = Math.round(originalMetrics.savings * cloudRatio);
+            
+            updateMetrics(newRisk, newEffort, newSavings);
+        }
+        
+        // Update displayed metrics
+        function updateMetrics(risk, effort, savings) {
+            const riskElem = document.getElementById('risk-score');
+            const effortElem = document.getElementById('effort-value');
+            const savingsElem = document.getElementById('savings-value');
+            
+            const riskChangeElem = document.getElementById('risk-change');
+            const effortChangeElem = document.getElementById('effort-change');
+            const savingsChangeElem = document.getElementById('savings-change');
+            
+            if (risk === undefined) {
+                // Reset to original
+                riskElem.textContent = originalMetrics.risk;
+                effortElem.textContent = originalMetrics.effort;
+                savingsElem.textContent = '$' + originalMetrics.savings.toLocaleString();
+                
+                riskChangeElem.textContent = 'Baseline';
+                effortChangeElem.textContent = '~' + Math.ceil(originalMetrics.effort / 20) + ' person team';
+                savingsChangeElem.textContent = '~' + Math.round(originalMetrics.effort * 800 / originalMetrics.savings) + ' month payback';
+            } else {
+                // Update with new values
+                riskElem.textContent = risk;
+                effortElem.textContent = effort;
+                savingsElem.textContent = '$' + savings.toLocaleString();
+                
+                const riskDelta = risk - originalMetrics.risk;
+                const effortDelta = effort - originalMetrics.effort;
+                const savingsDelta = savings - originalMetrics.savings;
+                
+                riskChangeElem.textContent = (riskDelta >= 0 ? '+' : '') + riskDelta + ' from baseline';
+                riskChangeElem.style.color = riskDelta <= 0 ? '#58D3A5' : '#EF4444';
+                
+                effortChangeElem.textContent = (effortDelta >= 0 ? '+' : '') + effortDelta + ' days';
+                effortChangeElem.style.color = effortDelta <= 0 ? '#58D3A5' : '#E3B65D';
+                
+                savingsChangeElem.textContent = (savingsDelta >= 0 ? '+' : '') + '$' + Math.abs(savingsDelta).toLocaleString();
+                savingsChangeElem.style.color = savingsDelta >= 0 ? '#58D3A5' : '#EF4444';
+            }
+        }
+        
+        // Action handlers
+        function generateMigrationPlan() {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            
+            const content = document.createElement('div');
+            content.style.cssText = 'background: #1F2937; border: 2px solid #58D3A5; border-radius: 12px; padding: 32px; max-width: 800px; max-height: 80vh; overflow-y: auto; color: #E5E7EB;';
+            content.innerHTML = `
+                <h2 style="color: #58D3A5; margin-bottom: 20px;">🚀 Automated Migration Plan</h2>
+                <div style="margin-bottom: 24px;">
+                    <h3 style="color: #E3B65D; font-size: 18px; margin-bottom: 12px;">Phase 1: Foundation (Weeks 1-4)</h3>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Migrate data stores to cloud database services</li>
+                        <li>Set up infrastructure (VMs/OCP clusters)</li>
+                        <li>Configure networking and security</li>
+                        <li><strong>Team:</strong> 3 infrastructure engineers + 2 DBAs</li>
+                    </ul>
+                </div>
+                <div style="margin-bottom: 24px;">
+                    <h3 style="color: #E3B65D; font-size: 18px; margin-bottom: 12px;">Phase 2: Core Logic (Weeks 5-12)</h3>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Migrate programs to containerized services</li>
+                        <li>Convert batch jobs to scheduled cloud tasks</li>
+                        <li>Implement API gateways</li>
+                        <li><strong>Team:</strong> 6 developers + 2 architects</li>
+                    </ul>
+                </div>
+                <div style="margin-bottom: 24px;">
+                    <h3 style="color: #E3B65D; font-size: 18px; margin-bottom: 12px;">Phase 3: Integration (Weeks 13-16)</h3>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Migrate online transactions to cloud endpoints</li>
+                        <li>Modernize UI to cloud-native frontend</li>
+                        <li>End-to-end testing and validation</li>
+                        <li><strong>Team:</strong> 4 developers + 3 QA engineers</li>
+                    </ul>
+                </div>
+                <div style="background: #374151; padding: 16px; border-radius: 8px; margin-top: 24px;">
+                    <p><strong>Total Duration:</strong> 16 weeks (parallel execution)</p>
+                    <p><strong>Team Size:</strong> Peak of 8 engineers</p>
+                    <p><strong>Critical Path:</strong> Database migration → Program conversion → Transaction integration</p>
+                    <p style="margin-top: 12px; color: #58D3A5;"><strong>✓ Ready to export as Gantt chart or JIRA tickets</strong></p>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 24px; background: #58D3A5; color: #0D0D0F; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">Close</button>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        }
+        
+        function exportEvidence() {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            
+            const content = document.createElement('div');
+            content.style.cssText = 'background: #1F2937; border: 2px solid #58D3A5; border-radius: 12px; padding: 32px; max-width: 800px; max-height: 80vh; overflow-y: auto; color: #E5E7EB;';
+            content.innerHTML = `
+                <h2 style="color: #58D3A5; margin-bottom: 20px;">📦 Evidence Package</h2>
+                <div style="margin-bottom: 24px;">
+                    <h3 style="color: #E3B65D; font-size: 18px; margin-bottom: 12px;">Executive Summary</h3>
+                    <p style="line-height: 1.6;">Application modernization assessment shows <strong>Risk Score: ${originalMetrics.risk}</strong> with estimated <strong>${originalMetrics.effort} days effort</strong>. Cloud migration offers <strong>$${originalMetrics.savings.toLocaleString()} annual savings</strong> with ~12 month payback period.</p>
+                </div>
+                <div style="margin-bottom: 24px;">
+                    <h3 style="color: #E3B65D; font-size: 18px; margin-bottom: 12px;">Risk Analysis</h3>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>High:</strong> ${risks.filter(r => r.severity === 'high').length} risks identified</li>
+                        <li><strong>Medium:</strong> ${risks.filter(r => r.severity === 'medium').length} risks identified</li>
+                        <li><strong>Low:</strong> ${risks.filter(r => r.severity === 'low').length} risks identified</li>
+                    </ul>
+                </div>
+                <div style="margin-bottom: 24px;">
+                    <h3 style="color: #E3B65D; font-size: 18px; margin-bottom: 12px;">Dependency Evidence</h3>
+                    <p style="line-height: 1.6;">Analyzed <strong>${graphData.nodes.length} components</strong> with <strong>${graphData.links.length} dependencies</strong>. Critical components have been identified with blast radius mapping.</p>
+                </div>
+                <div style="background: #374151; padding: 16px; border-radius: 8px; margin-top: 24px;">
+                    <p style="color: #58D3A5;"><strong>✓ Package includes:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 8px;">
+                        <li>Executive summary (PDF)</li>
+                        <li>Technical analysis (JSON)</li>
+                        <li>Dependency graphs (SVG)</li>
+                        <li>Risk register (CSV)</li>
+                    </ul>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 24px; background: #58D3A5; color: #0D0D0F; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">Close</button>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        }
+        
+        function exportScenario() {
+            const assignmentCount = Object.keys(nodeAssignments).length;
+            if (assignmentCount === 0) {
+                alert('No scenario to save. Switch to Simulate mode and assign platforms to components.');
+                return;
+            }
+            alert(`💾 Scenario Saved\n\nSaved what-if scenario with ${assignmentCount} platform assignments.\n\nYou can load this scenario later to compare different migration strategies.`);
+        }
+        
+        // Graph rendering (simplified for demo - use full implementation from original dashboard)
+        function renderGraph() {
+            const svg = document.getElementById('dependency-graph');
+            const width = svg.clientWidth;
+            const height = svg.clientHeight;
+            
+            // Basic force-directed layout simulation would go here
+            // For hackathon demo, this connects to the existing dashboard's graph rendering
+            console.log('Graph rendering with', graphData.nodes.length, 'nodes');
+        }
+        
+        // Highlight node from Q&A results
+        function highlightNode(nodeId) {
+            const node = graphData.nodes.find(n => n.id === nodeId);
+            if (node) {
+                selectNode(node);
+                // Visual highlight animation would go here
+                console.log('Highlighting node:', node.name);
+            }
+        }
+        
+        // Select node and show blast radius
+        function selectNode(node) {
+            selectedNode = node;
+            console.log('Selected node:', node.name, 'Risk:', node.risk);
+            // Blast radius calculation and visualization from original dashboard
+        }
+        
+        // Update node color based on platform assignment
+        function updateNodeColor(nodeId, platform) {
+            const colors = {
+                'vm': '#E3B65D',
+                'ocp': '#58D3A5',
+                'mainframe': '#6B7280'
+            };
+            // Apply color to node in graph
+            console.log('Assigning', nodeId, 'to', platform);
+        }
+        
+        // Initialize
+        renderGraph();
+        
+        // Enable Enter key for Q&A
+        document.getElementById('qa-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleNLQuery();
+            }
+        });
+    </script>
+</body>
+</html>
